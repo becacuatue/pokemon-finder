@@ -4,5 +4,6 @@
     let data = await response.json();
     document.getElementById("pokemonImageBack").src = data.sprites.back_default;
     document.getElementById("pokemonImage").src = data.sprites.front_default;
-    document.getElementById("ability").innerHTML = data.abilities.ability.name;
+    document.getElementById("name").innerHTML = data.name;
+    document.getElementById("weight").innerHTML = data.weight;
  }
