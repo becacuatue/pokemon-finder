@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lớp học của tôi · DTEdu</title>
+    <link rel="stylesheet" href="classroom.css">
+</head>
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="navbar">
+        <div class="container nav-content">
+            <a href="index.html" class="logo">DT<span>Edu</span></a>
+            <nav class="nav-links">
+                <a href="index.html">Trang chủ</a>
+                <a href="classroom.html" class="active">Lớp học</a>
+                <a href="#" onclick="showLearningStats(); return false;">Kết quả học tập</a>
+            </nav>
+            <div class="nav-right">
+                <!-- Hiển thị khi đã đăng nhập (được classroom.js cập nhật) -->
+                <div class="nav-user-chip hidden" id="nav-user-chip">
+                    <span class="avatar-sm" id="nav-avatar-sm">?</span>
+                    <span id="nav-user-name">Học viên</span>
+                </div>
+                <a href="#class-selection-section" class="btn btn-primary">Vào lớp học</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= PHẦN 1: CHỌN LỚP ================= -->
+    <section id="class-selection-section" class="container panel-card">
+
+        <!-- Thông tin học viên (được classroom.js điền dữ liệu khi đăng nhập) -->
+        <div class="welcome-bar">
+            <div class="welcome-avatar" id="student-avatar">🎓</div>
+            <div class="welcome-text">
+                <p class="welcome-eyebrow">Chào mừng trở lại</p>
+                <h2 id="student-name">Khách</h2>
+                <p class="welcome-sub">Đang học: <span id="student-current-class">Chưa chọn khóa học</span></p>
+            </div>
+        </div>
+
+        <!-- Tổng quan số liệu học tập -->
+        <div class="stats-overview">
+            <div class="summary-card">
+                <h3>Tổng bài đã làm</h3>
+                <div class="val" id="stat-total-tests">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Điểm trung bình</h3>
+                <div class="val" id="stat-avg-score">0%</div>
+            </div>
+            <div class="summary-card">
+                <h3>Tổng câu đúng</h3>
+                <div class="val" id="stat-total-correct">0</div>
+            </div>
+        </div>
+
+        <div class="section-heading">
+            <h2>📚 Chọn Khóa Học</h2>
+        </div>
+        <p class="section-sub">Chọn khóa học phù hợp với mục tiêu của bạn để bắt đầu luyện tập ngay hôm nay.</p>
+
+        <div id="classes-grid" class="grid">
+            <!-- Mặc định giả lập 3 lớp nếu bạn chưa tạo bảng classes trên Firebase -->
+            <div class="card" onclick="loadExercisesForClass('ielts', 'Luyện thi IELTS')">
+                <h3>📖 Luyện thi IELTS</h3>
+                <p>Bài tập chuyên sâu IELTS Reading &amp; Listening</p>
+            </div>
+            <div class="card" onclick="loadExercisesForClass('toeic', 'Luyện thi TOEIC')">
+                <h3>💼 Luyện thi TOEIC</h3>
+                <p>Bài tập Toeic format mới</p>
+            </div>
+            <div class="card" onclick="loadExercisesForClass('tienganhgiaotiep', 'Tiếng Anh Giao Tiếp')">
+                <h3>🗣️ Tiếng Anh Giao Tiếp</h3>
+                <p>Từ vựng &amp; Mẫu câu thông dụng</p>
+            </div>
+        </div>
+
+        <div class="stats-cta">
+            <button class="btn-action btn-outline btn" onclick="showLearningStats()">
+                📈 Xem kết quả &amp; Lịch sử học tập của tôi
+            </button>
+        </div>
+    </section>
+
+    <!-- ================= PHẦN 2: DANH SÁCH BÀI TẬP (Dashboard) ================= -->
+    <section id="dashboard-section" class="container panel-card hidden">
+        <button class="btn-back" onclick="goBackToClasses()">&#8592; Quay lại chọn lớp</button>
+        <div class="section-heading">
+            <h2 id="current-class-title">Bài tập: --</h2>
+        </div>
+        <p class="section-sub">Chọn một bài tập bên dưới để bắt đầu làm bài.</p>
+        <div id="lesson-grid" class="grid"></div>
+    </section>
+
+    <!-- ================= PHẦN 3: LÀM BÀI TẬP (Split View) ================= -->
+    <section id="test-section" class="test-area hidden">
+        <div class="test-header">
+            <div>
+                <button class="btn-back" onclick="goBackToDashboard()">&#8592; Thoát</button>
+                <h3 id="current-test-title">Đang tải...</h3>
+            </div>
+            <div class="timer">⏱ <span id="timer">00:00</span> phút</div>
+        </div>
+
+        <div class="test-split-view">
+            <!-- Cột trái: Bài đọc / Ngữ liệu -->
+            <div class="passage-panel" id="test-content">
+                <!-- Nội dung bài đọc render từ JS -->
+            </div>
+
+            <!-- Cột phải: Câu hỏi -->
+            <div class="questions-panel">
+                <form id="quiz-form">
+                    <div id="questions-container">
+                        <!-- Câu hỏi render từ JS -->
+                    </div>
+                    <button type="submit" class="btn-submit">Nộp bài &amp; Chấm điểm</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= PHẦN 4: KẾT QUẢ ================= -->
+    <section id="result-section" class="container panel-card hidden">
+        <button class="btn-back" onclick="goBackToDashboard()">&#8592; Về danh sách bài tập</button>
+
+        <div class="result-hero">
+            <div class="score-ring" id="score-ring">
+                <span id="score-display">0%</span>
+            </div>
+            <div>
+                <h2>📊 Điểm số của bạn</h2>
+                <div class="result-meta">
+                    <p>Số lỗi sai: <strong id="mistake-count" class="text-red">0</strong></p>
+                    <p>Phân tích điểm yếu: <strong id="knowledge-gap">--</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="result-section-title">Chi tiết từng câu:</h3>
+        <div id="detailed-results"></div>
+    </section>
+
+    <!-- ================= PHẦN 5: THỐNG KÊ KẾT QUẢ HỌC TẬP TỔNG QUAN ================= -->
+    <section id="learning-stats-section" class="container panel-card wide hidden">
+        <button class="btn-back" onclick="goBackFromStats()">&#8592; Quay lại chọn lớp</button>
+
+        <div class="result-area">
+            <!-- Thẻ tổng quan chỉ số -->
+            <div class="dashboard-dark">
+                <h2 class="dash-title">📊 Thống kê kết quả học tập của bạn</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-desc">Tổng số bài đã làm</div>
+                        <div class="stat-value text-blue" id="total-tests">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-desc">Điểm trung bình tích lũy</div>
+                        <div class="stat-value text-green" id="avg-score">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-desc">Tổng câu trả lời đúng</div>
+                        <div class="stat-value text-orange" id="total-correct">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lịch sử chi tiết các bài đã làm -->
+            <div class="history-panel">
+                <h3>🕒 Lịch sử nộp bài chi tiết</h3>
+                <div id="history-list" class="detailed-results-container">
+                    <!-- Render từ JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <p>© 2026 <strong>DTEdu</strong> — Nền tảng học tiếng Anh được thiết kế riêng cho bạn.</p>
+    </footer>
+
+    <script type="module" src="classroom.js"></script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+/* Tối ưu hóa mặc định */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* --- HỆ MÀU MATCHA & CÁC BIẾN --- */
+:root {
+    --matcha-lightest: #f3f8f4; /* Nền mờ, xám xanh rất nhạt */
+    --matcha-light: #cde0d2;    /* Xanh matcha nhạt (hover, badge) */
+    --matcha-primary: #85af90;  /* Màu chủ đạo của nút, nhấn */
+    --matcha-dark: #5c8466;     /* Màu đậm cho header, hover nút */
+    --text-dark: #2a3a30;       /* Chữ đen ngả xanh lá */
+    --text-gray: #5a7364;       /* Chữ đoạn văn */
+    --white: #ffffff;
+    --shadow: 0 10px 30px rgba(92, 132, 102, 0.08);
+}
+
+body {
+    background-color: var(--white);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- COMPONENTS: NÚT BẤM (BUTTONS) --- */
+.btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: var(--matcha-primary);
+    color: var(--white);
+    border: 2px solid var(--matcha-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--matcha-dark);
+    border-color: var(--matcha-dark);
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--matcha-dark);
+    border: 2px solid var(--matcha-light);
+}
+
+.btn-outline:hover {
+    border-color: var(--matcha-primary);
+    background-color: var(--matcha-lightest);
+}
+
+.btn-dark {
+    background-color: var(--matcha-dark);
+    color: var(--white);
+    border: none;
+}
+
+.btn-dark:hover {
+    background-color: var(--text-dark);
+}
+
+/* --- NAVBAR --- */
+.navbar {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid var(--matcha-lightest);
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.logo span {
+    color: var(--matcha-primary);
+}
+
+.nav-links a {
+    margin: 0 15px;
+    color: var(--text-dark);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--matcha-primary);
+}
+
+/* --- HERO SECTION --- */
+.hero {
+    padding: 160px 0 100px;
+    background-color: var(--matcha-lightest);
+    overflow: hidden;
+}
+
+.hero-content {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.hero-text {
+    flex: 1;
+}
+
+.badge {
+    background-color: var(--matcha-light);
+    color: var(--matcha-dark);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.hero-text h1 {
+    font-size: 48px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.hero-text h1 span {
+    color: var(--matcha-primary);
+}
+
+.hero-text p {
+    font-size: 18px;
+    color: var(--text-gray);
+    margin-bottom: 30px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.hero-image {
+    flex: 1;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(135deg, var(--matcha-light), var(--matcha-primary));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+/* --- FEATURES SECTION --- */
+.features {
+    padding: 100px 0;
+    background-color: var(--white);
+}
+
+.section-title {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 60px;
+}
+
+.section-title h2 {
+    font-size: 36px;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+}
+
+.section-title p {
+    color: var(--text-gray);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    background-color: var(--white);
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--matcha-lightest);
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-card .icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+    background-color: var(--matcha-lightest);
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+}
+
+.feature-card h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: var(--text-dark);
+}
+
+.feature-card p {
+    color: var(--text-gray);
+    font-size: 15px;
+}
+
+/* --- CTA SECTION --- */
+.cta-section {
+    padding: 80px 0;
+    background-color: var(--matcha-primary);
+    text-align: center;
+}
+
+.cta-content h2 {
+    color: var(--white);
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.cta-content p {
+    color: var(--matcha-lightest);
+    margin-bottom: 30px;
+}
+
+.cta-form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.cta-form input {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 50px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+}
+
+/* --- FOOTER --- */
+.footer {
+    background-color: var(--matcha-lightest);
+    padding: 80px 0 20px;
+    color: var(--text-dark);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.brand-col p {
+    margin-top: 15px;
+    color: var(--text-gray);
+    font-size: 14px;
+}
+
+.footer-col h4 {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.footer-col ul {
+    list-style: none;
+}
+
+.footer-col ul li {
+    margin-bottom: 10px;
+}
+
+.footer-col ul li a {
+    color: var(--text-gray);
+    transition: color 0.3s ease;
+    font-size: 14px;
+}
+
+.footer-col ul li a:hover {
+    color: var(--matcha-primary);
+}
+
+.footer-col p {
+    color: var(--text-gray);
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--matcha-light);
+    color: var(--text-gray);
+    font-size: 14px;
+}
+/* --- BỔ SUNG CSS CHO MODAL ĐĂNG NHẬP --- */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+.modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+.modal.hidden .modal-content {
+    transform: translateY(-20px);
+}
+.close-modal {
+    position: absolute;
+    top: 15px; right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+.auth-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+.auth-tab {
+    flex: 1;
+    background: none; border: none;
+    padding: 10px;
+    font-size: 16px; font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+.auth-tab.active {
+    color: var(--matcha-primary, #81c784);
+    border-bottom-color: var(--matcha-primary, #81c784);
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block; margin-bottom: 5px;
+    font-weight: 500; font-size: 14px;
+}
+.form-group input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+.error-msg {
+    color: red; font-size: 13px; margin-bottom: 10px;
+}
+.w-100 { width: 100%; }
+.auth-form.hidden { display: none; }
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .hero-text h1 {
+        font-size: 36px;
+    }
+
+    .nav-links {
+        display: none; /* Trong thực tế sẽ dùng hamburger menu */
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-form {
+        flex-direction: column;
+    }
+}

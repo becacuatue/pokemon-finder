@@ -1,22 +1,300 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>DTEdu English | Tinh Thông Tiếng Anh Mỗi Ngày</title>
+    <!-- Tích hợp Font Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <input id="pokemonName" type="text" placeholder="enter pokemon name ">
-    <button onclick="search()">search</button><br>
-    <img src="" id="pokemonImageBack" style="width: 40%;">
-    <img src="" id="pokemonImage" style="width: 40%;">
-    <div style="display: flex;">
-        <h2 style="margin-right: 10px;"> name:</h2>
-        <h2 id="name" style="margin-right: 10px;"></h2>
-        <h2 style="margin-right: 10px;"> weight:</h2>
-        <h2 id="weight" style="margin-right: 10px;"></h2>
+
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="container nav-content">
+            <a href="#" class="logo">DT<span>Edu</span></a>
+            <nav class="nav-links">
+                <a href="index.html">Trang chủ</a>
+                <a href="classroom.html">Lớp học</a>
+                <a onclick="openAuthModal('login')" class="login-link">Đăng nhập</a>
+            </nav>
+            <a href="#register" class="btn btn-primary">Học thử ngay</a>
+        </div>
+    </header>
+    <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
+    <div id="auth-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="auth-tabs">
+                <button id="tab-login" class="auth-tab active">Đăng nhập</button>
+                <button id="tab-register" class="auth-tab">Đăng ký</button>
+            </div>
+
+            <!-- Form Đăng Nhập -->
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="Nhập email..." required>
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="login-password" placeholder="Nhập mật khẩu..." required>
+                </div>
+                <p id="login-error" class="error-msg"></p>
+                <button type="submit" class="btn btn-primary w-100">Đăng nhập vào lớp</button>
+            </form>
+
+            <!-- Form Đăng Ký -->
+            <form id="register-form" class="auth-form hidden">
+                <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" id="reg-name" placeholder="Ví dụ: Nguyễn Văn A..." required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" placeholder="Nhập email..." required>
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="reg-password" placeholder="Tạo mật khẩu (tối thiểu 6 ký tự)..." required>
+                </div>
+                <p id="reg-error" class="error-msg"></p>
+                <button type="submit" class="btn btn-dark w-100">Tạo tài khoản</button>
+            </form>
+        </div>
     </div>
-   
-    <script src="test.js"></script>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <span class="badge">Nền tảng học trực tuyến thế hệ mới</span>
+                <h1>Học Tiếng Anh Được <span>Thiết Kế Riêng</span> Cho Bạn</h1>
+                <p>Khám phá hệ thống học tập thông minh với các bài tập được cá nhân hóa 100%. Đánh giá toàn diện mọi kỹ năng của bạn sau từng phút học tập.</p>
+                <div class="hero-buttons">
+                    <a href="#register" class="btn btn-primary">Bắt đầu lộ trình</a>
+                    <a href="#features" class="btn btn-outline">Tìm hiểu thêm</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="image-placeholder">
+                    <!-- Danh sách các ảnh trong gallery -->
+                    <img src="Gemini_Generated_Image_pqvu6vpqvu6vpqvu.png" class="active" alt="Gallery Image 1">
+                    <img src="photo-3-17153126485401360823109.jpg" alt="Gallery Image 2">
+                    <img src="Hinh-anh-mot-goc-trung-tam-DOL-English-1024x576.png" alt="Gallery Image 3">
+                    <img src="photo-1-17156573288831969948291.jpg" alt="Gallery Image 4">
+
+                    <!-- CSS Nội bộ chỉ áp dụng cho component này -->
+                    <style>
+                        .image-placeholder {
+                            width: 100%;
+                            height: 400px;
+                            background: linear-gradient(135deg, var(--matcha-light, #e8f5e9), var(--matcha-primary, #81c784));
+                            border-radius: 20px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: var(--white, #fff);
+                            font-weight: 500;
+                            box-shadow: var(--shadow, 0 10px 30px rgba(0,0,0,0.1));
+                            position: relative;
+                            overflow: hidden; /* Bắt buộc để ẩn các ảnh nằm ngoài khung */
+                            cursor: pointer;
+
+                            img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover; /* Giúp ảnh không bị biến dạng */
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                opacity: 0;
+                                transform: scale(0.9) translateY(30px);
+                                filter: blur(4px);
+                                transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                                            opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                                            filter 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+                                z-index: 1;
+
+                                /* Ảnh đang hiển thị chính */
+                                &.active {
+                                    opacity: 1;
+                                    transform: scale(1) translateY(0);
+                                    filter: blur(0);
+                                    z-index: 3;
+                                }
+
+                                /* Ảnh cũ bị ẩn xuống */
+                                &.exit {
+                                    opacity: 0;
+                                    transform: scale(0.95) translateY(40px);
+                                    filter: blur(6px);
+                                    z-index: 2;
+                                }
+                            }
+                        }
+                    </style>
+
+                    <!-- JavaScript xử lý chuyển ảnh & tương tác chuột -->
+                    <script>
+                        (function() {
+                            // Lấy ra slider gần nhất chứa script này
+                            const container = document.currentScript.parentElement;
+                            const images = container.querySelectorAll('img');
+                            if (images.length <= 1) return;
+
+                            let currentIndex = 0;
+                            let normalInterval = 3500; // Tốc độ bình thường (3.5 giây/ảnh)
+                            let fastInterval = 1200;   // Tốc độ nhanh khi di chuột (1.2 giây/ảnh)
+                            let slideTimer = null;
+                            let resetSpeedTimeout = null;
+                            let isFastMode = false;
+
+                            // Hàm chuyển tới ảnh tiếp theo
+                            function nextSlide() {
+                                const currentImg = images[currentIndex];
+                                
+                                // Cập nhật chỉ số ảnh tiếp theo
+                                currentIndex = (currentIndex + 1) % images.length;
+                                const nextImg = images[currentIndex];
+
+                                // Đặt trạng thái thoát cho ảnh cũ
+                                currentImg.classList.remove('active');
+                                currentImg.classList.add('exit');
+
+                                // Đưa ảnh mới vào
+                                nextImg.classList.remove('exit');
+                                nextImg.classList.add('active');
+
+                                // Dọn dẹp class exit sau khi hoàn tất transition
+                                setTimeout(() => {
+                                    currentImg.classList.remove('exit');
+                                }, 800);
+                            }
+
+                            // Bắt đầu vòng lặp chuyển ảnh
+                            function startTimer(interval) {
+                                stopTimer();
+                                slideTimer = setInterval(nextSlide, interval);
+                            }
+
+                            function stopTimer() {
+                                if (slideTimer) clearInterval(slideTimer);
+                            }
+
+                            // Khởi chạy slider ban đầu
+                            startTimer(normalInterval);
+
+                            // Sự kiện RÊ CHUỘT VÀO: Chạy nhanh hơn ngay lập tức
+                            container.addEventListener('mouseenter', () => {
+                                if (!isFastMode) {
+                                    isFastMode = true;
+                                    clearTimeout(resetSpeedTimeout);
+                                    nextSlide(); // Chuyển ngay 1 ảnh cho nhạy
+                                    startTimer(fastInterval);
+                                }
+                            });
+
+                            // Sự kiện RỜI CHUỘT: Chờ 1 giây rồi chậm lại như cũ
+                            container.addEventListener('mouseleave', () => {
+                                clearTimeout(resetSpeedTimeout);
+                                resetSpeedTimeout = setTimeout(() => {
+                                    isFastMode = false;
+                                    startTimer(normalInterval);
+                                }, 1000); // Đợi đúng 1s sau khi rời chuột mới chạy chậm lại
+                            });
+                        })();
+                    </script>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Tại sao chọn DTEdu English?</h2>
+                <p>Hệ thống công nghệ giáo dục độc quyền giúp tối ưu hóa thời gian và năng lực của từng học viên.</p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="icon">🎯</div>
+                    <h3>Hệ Thống Bài Tập Cá Nhân Hóa</h3>
+                    <p>Không có hai lộ trình giống nhau. AI tự động phân tích điểm mạnh, điểm yếu của bạn để đề xuất độ khó và chủ đề bài tập phù hợp nhất ở từng thời điểm.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h3>Đánh Giá Chỉ Số Toàn Diện</h3>
+                    <p>Báo cáo chi tiết sau mỗi bài học. Theo dõi sát sao các chỉ số về: Từ vựng, Ngữ pháp, Độ trôi chảy và Độ chính xác của phát âm bằng biểu đồ trực quan.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="icon">💡</div>
+                    <h3>Giao Diện Thân Thiện & Đẹp Mắt</h3>
+                    <p>Trải nghiệm học tập không áp lực với tone màu mát mẻ, thiết kế hiện đại, tập trung cao độ, dễ dàng thao tác trên mọi thiết bị.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to action Section -->
+    <section id="register" class="cta-section">
+        <div class="container cta-content">
+            <h2>Sẵn sàng nâng trình Tiếng Anh của bạn?</h2>
+            <p>Tham gia cùng hàng ngàn học viên khác và trải nghiệm hệ thống học tập được may đo cho riêng bạn.</p>
+            <form class="cta-form">
+                <input type="email" placeholder="Nhập email của bạn..." required>
+                <button type="submit" class="btn btn-dark">Nhận tư vấn miễn phí</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col brand-col">
+                <a href="#" class="logo">DT<span>Edu</span></a>
+                <p>Nền tảng giáo dục tiếng Anh trực tuyến tiên phong ứng dụng công nghệ cá nhân hóa để mang lại hiệu quả vượt trội.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Về chúng tôi</h4>
+                <ul>
+                    <li><a href="#">Giới thiệu</a></li>
+                    <li><a href="#">Đội ngũ giáo viên</a></li>
+                    <li><a href="#">Tuyển dụng</a></li>
+                    <li><a href="#">Blog học thuật</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Hỗ trợ</h4>
+                <ul>
+                    <li><a href="#">Trung tâm trợ giúp</a></li>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">Liên hệ kỹ thuật</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Liên hệ</h4>
+                <p>📍 123 Đường Công Nghệ, Hà Nội</p>
+                <p>📞 0335038618</p>
+                <p>✉️ becacuatue@gmail.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom container">
+            <p>&copy; 2026 Matcha English. Đã đăng ký bản quyền.</p>
+        </div>
+    </footer>
+    <script type="module" src="auth.js"></script>
 </body>
 </html>
