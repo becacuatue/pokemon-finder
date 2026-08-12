@@ -182,7 +182,8 @@ label:focus-within{
 }
 .btn-primary:hover{ background:var(--matcha-primary-dark); transform:translateY(-1px); }
  
-/* Chip thông tin học viên trên thanh điều hướng (được JS điền dữ liệu) */
+/* Chip thông tin học viên trên thanh điều hướng (được JS điền dữ liệu) —
+   giờ là link dẫn tới trang hồ sơ cá nhân (profile.html) */
 .nav-user-chip{
   display:flex;
   align-items:center;
@@ -193,6 +194,16 @@ label:focus-within{
   font-size:13.5px;
   font-weight:600;
   color:var(--matcha-badge-text);
+  transition:background .15s ease, transform .15s ease;
+}
+.nav-user-chip:hover{
+  background:var(--matcha-primary);
+  color:var(--white);
+  transform:translateY(-1px);
+}
+.nav-user-chip:hover .avatar-sm{
+  background:var(--white);
+  color:var(--matcha-primary-dark);
 }
 .nav-user-chip .avatar-sm{
   width:28px; height:28px;
@@ -307,6 +318,7 @@ label:focus-within{
   grid-template-columns:repeat(auto-fill, minmax(250px,1fr));
   gap:20px;
   margin-top:22px;
+
 }
  
 .card{
@@ -319,6 +331,12 @@ label:focus-within{
   box-shadow:var(--shadow-soft);
   transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   overflow:hidden;
+}
+.card-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
 }
 .card::before{
   content:"";
