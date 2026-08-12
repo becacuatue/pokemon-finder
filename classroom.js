@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged,signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, getDocs, query, where, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
  
 const firebaseConfig = {
@@ -73,7 +73,10 @@ function renderStudentInfo(user) {
     const navChip = document.getElementById('nav-user-chip');
     const navAvatar = document.getElementById('nav-avatar-sm');
     const navName = document.getElementById('nav-user-name');
- 
+    const dropdownName = document.getElementById('dropdown-name');
+    const dropdownEmail = document.getElementById('dropdown-email');
+    const dropdownUid = document.getElementById('dropdown-uid');
+    const dropdownAvatar = document.getElementById('dropdown-avatar');
     const displayName = user ? (user.displayName || user.email || 'Học viên') : 'Khách';
     const initials = user ? getInitials(user.displayName || user.email) : '🎓';
  
@@ -85,12 +88,41 @@ function renderStudentInfo(user) {
             navChip.classList.remove('hidden');
             navAvatar.textContent = initials;
             navName.textContent = displayName;
+            if (dropdownName) dropdownName.textContent = displayName;
+            if (dropdownEmail) dropdownEmail.textContent = user.email || 'Không có email';
+            if (dropdownUid) dropdownUid.textContent = user.uid;
+            if (dropdownAvatar) dropdownAvatar.textContent = initials;
         } else {
             navChip.classList.add('hidden');
         }
     }
 }
- 
+window.toggleUserInfo = function() {
+    const dropdown = document.getElementById('user-info-dropdown');
+    if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+};
+window.handleLogout = function() {
+    // Xóa dữ liệu lớp học đang lưu tạm (tùy chọn)
+    localStorage.removeItem('dtedu_current_class_name'); 
+    
+    signOut(auth).then(() => {
+        // Đăng xuất thành công, tải lại trang hoặc chuyển về trang chủ
+        window.location.href = 'index.html'; 
+    }).catch((error) => {
+        console.error("Lỗi đăng xuất:", error);
+        alert("Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại!");
+    });
+};
+// Đóng khung thông tin nếu click ra ngoài vùng nav-user-chip
+document.addEventListener('click', (e) => {
+    const chip = document.getElementById('nav-user-chip');
+    const dropdown = document.getElementById('user-info-dropdown');
+    if (chip && dropdown && !chip.contains(e.target)) {
+        dropdown.style.display = 'none';
+    }
+});
 // Ghi nhớ & hiển thị khóa học học viên đang xem/luyện tập gần nhất
 function setCurrentClassDisplay(className) {
     const el = document.getElementById('student-current-class');
@@ -183,7 +215,7 @@ window.loadExercisesForClass = async function(classId, className) {
             card.className = 'card';
             card.innerHTML = `
                 <h3>${test.title}</h3>
-                <p>${test.description || 'Không có mô tả'}</p>
+                <p class="card-description">${test.description || 'Không có mô tả'}</p>
                 <div class="lesson-meta">
                     <span class="meta-chip">📝 ${test.questions ? test.questions.length : 0} câu</span>
                     <span class="meta-chip">⏱ ${test.timeLimit} phút</span>

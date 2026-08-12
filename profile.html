@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ của tôi · DTEdu</title>
+    <link rel="stylesheet" href="classroom.css">
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="navbar">
+        <div class="container nav-content">
+            <a href="index.html" class="logo">DT<span>Edu</span></a>
+            <nav class="nav-links">
+                <a href="index.html">Trang chủ</a>
+                <a href="classroom.html">Lớp học</a>
+                <a href="classroom.html">Kết quả học tập</a>
+            </nav>
+            <div class="nav-right">
+                <!-- Chip học viên (được profile.js cập nhật) -->
+                <a href="profile.html" class="nav-user-chip hidden" id="nav-user-chip" title="Hồ sơ cá nhân">
+                    <span class="avatar-sm" id="nav-avatar-sm">?</span>
+                    <span id="nav-user-name">Học viên</span>
+                </a>
+                <button class="btn btn-outline hidden" id="btn-profile-logout">Đăng xuất</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= CHƯA ĐĂNG NHẬP ================= -->
+    <section id="profile-guest-section" class="container panel-card hidden">
+        <div class="profile-empty-state">
+            <div class="profile-empty-icon">🔒</div>
+            <h2>Bạn cần đăng nhập để xem hồ sơ</h2>
+            <p>Vui lòng đăng nhập để xem thông tin cá nhân, điểm số và nhận xét của giáo viên qua từng buổi học.</p>
+            <a href="classroom.html" class="btn btn-primary">Về trang lớp học</a>
+        </div>
+    </section>
+
+    <!-- ================= CHƯA CÓ HỒ SƠ HỌC VIÊN ================= -->
+    <section id="profile-missing-section" class="container panel-card hidden">
+        <div class="profile-empty-state">
+            <div class="profile-empty-icon">📋</div>
+            <h2>Chưa có hồ sơ học viên</h2>
+            <p>Tài khoản của bạn chưa được khởi tạo hồ sơ học viên trong hệ thống. Vui lòng liên hệ giáo viên / quản trị viên để được hỗ trợ.</p>
+            <a href="classroom.html" class="btn btn-primary">Về trang lớp học</a>
+        </div>
+    </section>
+
+    <!-- ================= HỒ SƠ CHÍNH ================= -->
+    <section id="profile-main-section" class="container panel-card hidden">
+
+        <div class="profile-welcome">
+            <p class="welcome-eyebrow">Hồ sơ học viên</p>
+            <h1>Xin chào, <span id="profile-name-inline">bạn</span> 👋</h1>
+        </div>
+
+        <div class="student-profile-header">
+            <div class="profile-avatar-wrap">
+                <img id="profile-avatar-img" class="profile-avatar hidden" src="" alt="Ảnh đại diện">
+                <div id="profile-avatar-fallback" class="profile-avatar">?</div>
+            </div>
+            <div class="profile-header-info">
+                <div class="profile-rank-badge" id="profile-rank-badge">Đang tính hạng...</div>
+                <h2 id="profile-student-name">--</h2>
+                <p class="profile-code">Mã học viên: <strong id="profile-student-code">------</strong> · Lớp: <span id="profile-student-class">--</span></p>
+            </div>
+        </div>
+
+        <div class="profile-grid">
+            <div class="profile-info-card">
+                <h3>👤 Thông tin cá nhân</h3>
+                <dl class="info-list" id="profile-info-list"></dl>
+            </div>
+            <div class="profile-score-card">
+                <h3>📊 Kết quả học tập</h3>
+                <div class="score-bars" id="profile-score-bars"></div>
+                <div class="composite-score-box">
+                    <span>Điểm tổng hợp (xếp hạng)</span>
+                    <strong id="profile-composite-score">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="sessions-section">
+            <div class="section-heading">
+                <h3>🗓 Nhận xét của giáo viên qua từng buổi học</h3>
+            </div>
+            <div id="profile-sessions-list" class="sessions-list"></div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <p>© 2026 <strong>DTEdu</strong> — Nền tảng học tiếng Anh được thiết kế riêng cho bạn.</p>
+    </footer>
+
+    <script type="module" src="profile.js"></script>
+</body>
+</html>
