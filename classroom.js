@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged,signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, query, where, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, query, where, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
  
 const firebaseConfig = {
     apiKey: "AIzaSyCCfo_YmY770dFXA13Z7RS-xk1Satm-FEY",
@@ -18,6 +18,27 @@ const db = getFirestore(app);
 let CURRENT_USER_ID = null; 
 let availableExercises = [];
 let currentTestSession = null;
+
+// [THÊM MỚI] Tập hợp ID các bài tập học viên đã làm (tô xanh nhạt trong danh sách bài)
+let completedExerciseIds = new Set();
+
+// [THÊM MỚI] Bộ đếm giờ khi làm bài
+let countdownIntervalId = null;
+
+// [THÊM MỚI] Công thức điểm tổng hợp — PHẢI khớp với admin.js/profile.js
+const SCORE_WEIGHTS = { test: 0.5, teacherEval: 0.3 };
+function computeCompositeScore(scores = {}) {
+    const test = scores?.testScoreAvg || 0;
+    const teacher = scores?.teacherEvalAvg || 0;
+    const bonus = scores?.bonusPoints || 0;
+    const participation = scores?.participationPoints || 0;
+    return Math.round(test * SCORE_WEIGHTS.test + teacher * 10 * SCORE_WEIGHTS.teacherEval + bonus + participation);
+}
+
+// [THÊM MỚI] Escape HTML để chèn dữ liệu (tên lớp, tiêu đề bài...) an toàn hơn
+function escapeHtml(str = '') {
+    return String(str).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
  
 // ============================================================
 // [THÊM MỚI] Hằng số & tiện ích hiển thị thông tin học viên /
@@ -28,30 +49,38 @@ const LAST_CLASS_STORAGE_KEY = 'dtedu_current_class_name';
 // Bổ sung hàm lấy danh sách lớp học cho giao diện Học viên
 async function loadClassesList() {
     // Trỏ đúng vào ID 'classes-grid' để không ghi đè phần đánh giá và welcome-bar
-    const classContainer = document.getElementById('classes-grid'); 
-    
+    const classContainer = document.getElementById('classes-grid');
+
     try {
         const querySnapshot = await getDocs(collection(db, "classes"));
-        let html = '';
-        
+
         if (querySnapshot.empty) {
-            classContainer.innerHTML = '<p>Chưa có lớp học nào.</p>';
+            classContainer.innerHTML = '<p>Chưa có lớp học nào. Vui lòng quay lại sau.</p>';
             return;
         }
 
-        querySnapshot.forEach((doc) => {
-            const classData = doc.data();
-            html += `
-                <div class="card class-card" onclick="window.loadExercisesForClass('${doc.id}', '${classData.name}')">
-                    <h3>${classData.name}</h3>
-                    <p>${classData.description || 'Không có mô tả'}</p>
-                </div>
-            `;
+        const classes = [];
+        querySnapshot.forEach((docSnap) => {
+            classes.push({ id: docSnap.id, ...docSnap.data() });
         });
-        
-        classContainer.innerHTML = html;
+        // Sắp xếp theo tên cho dễ tìm (không dùng orderBy phía Firestore — sẽ âm thầm
+        // loại bỏ những lớp thiếu field dùng để sắp xếp mà không báo lỗi gì cả)
+        classes.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'));
+
+        classContainer.innerHTML = '';
+        classes.forEach((classData) => {
+            const card = document.createElement('div');
+            card.className = 'card class-card';
+            card.innerHTML = `
+                <h3>${escapeHtml(classData.name || 'Lớp chưa đặt tên')}</h3>
+                <p>${escapeHtml(classData.description || classData.schedule || 'Không có mô tả')}</p>
+            `;
+            card.addEventListener('click', () => window.loadExercisesForClass(classData.id, classData.name || 'Lớp chưa đặt tên'));
+            classContainer.appendChild(card);
+        });
     } catch (error) {
         console.error("Lỗi khi tải danh sách lớp:", error);
+        classContainer.innerHTML = '<p>Không thể tải danh sách lớp học. Vui lòng kiểm tra kết nối và thử lại.</p>';
     }
 }
 
@@ -143,6 +172,92 @@ function loadRememberedClass() {
     } catch (e) { /* bỏ qua nếu trình duyệt chặn localStorage */ }
 }
 // ============================================================
+// [THÊM MỚI] Bài đã hoàn thành + Banner "Lớp đang học"
+// ============================================================
+
+// Tải danh sách ID bài tập học viên đã làm (dùng để tô xanh nhạt + tính tiến độ)
+async function loadCompletedExerciseIds() {
+    const userId = CURRENT_USER_ID || "guest_test_user";
+    try {
+        const q = query(collection(db, "results"), where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
+        completedExerciseIds = new Set();
+        querySnapshot.forEach((docSnap) => {
+            const exerciseId = docSnap.data().exerciseId;
+            if (exerciseId) completedExerciseIds.add(exerciseId);
+        });
+    } catch (error) {
+        console.error("Lỗi khi tải danh sách bài đã làm:", error);
+    }
+}
+
+// Banner "Lớp đang học" ở đầu trang: tiến độ / điểm / hạng của học viên trong LỚP THẬT
+// mà admin đã gán (students/{uid}.classId) — khác với "lớp đang xem gần nhất" ở welcome-bar.
+let myClassInfo = null; // { id, name }
+
+async function loadMyClassSummary() {
+    const banner = document.getElementById('my-class-banner');
+    if (!banner) return;
+
+    if (!CURRENT_USER_ID) {
+        banner.classList.add('hidden');
+        return;
+    }
+
+    try {
+        const studentSnap = await getDoc(doc(db, 'students', CURRENT_USER_ID));
+        if (!studentSnap.exists()) {
+            banner.classList.add('hidden');
+            return;
+        }
+        const student = studentSnap.data();
+        if (!student.classId) {
+            banner.classList.add('hidden');
+            return;
+        }
+
+        myClassInfo = { id: student.classId, name: student.className || 'Lớp của bạn' };
+
+        // Đếm tổng số bài tập của lớp + số bài đã hoàn thành trong lớp đó
+        const exSnap = await getDocs(query(collection(db, 'exercises'), where('targetClass', '==', student.classId)));
+        const classExerciseIds = [];
+        exSnap.forEach((d) => classExerciseIds.push(d.id));
+        const totalInClass = classExerciseIds.length;
+        const doneInClass = classExerciseIds.filter((id) => completedExerciseIds.has(id)).length;
+        const progressPct = totalInClass > 0 ? Math.round((doneInClass / totalInClass) * 100) : 0;
+
+        // Tính hạng trong lớp (cùng công thức & cách làm như admin.js/profile.js)
+        let rankText = '--';
+        try {
+            const classmatesSnap = await getDocs(query(collection(db, 'students'), where('classId', '==', student.classId)));
+            const list = [];
+            classmatesSnap.forEach((d) => list.push({ id: d.id, scores: d.data().scores }));
+            list.sort((a, b) => computeCompositeScore(b.scores) - computeCompositeScore(a.scores));
+            const idx = list.findIndex((x) => x.id === CURRENT_USER_ID);
+            if (idx > -1) rankText = `${idx + 1}/${list.length}`;
+        } catch (rankErr) {
+            console.error('Lỗi khi tính hạng:', rankErr);
+        }
+
+        // Đổ dữ liệu vào banner
+        document.getElementById('my-class-name').textContent = student.className || 'Lớp của bạn';
+        document.getElementById('my-class-progress-fill').style.width = `${progressPct}%`;
+        document.getElementById('my-class-progress-text').textContent = `${doneInClass}/${totalInClass} bài đã làm`;
+        document.getElementById('my-class-score').textContent = computeCompositeScore(student.scores);
+        document.getElementById('my-class-rank').textContent = rankText;
+
+        banner.classList.remove('hidden');
+    } catch (error) {
+        console.error('Lỗi khi tải thông tin lớp đang học:', error);
+        banner.classList.add('hidden');
+    }
+}
+
+document.getElementById('btn-goto-my-class')?.addEventListener('click', () => {
+    if (myClassInfo) window.loadExercisesForClass(myClassInfo.id, myClassInfo.name);
+});
+
+// ============================================================
 // [HẾT PHẦN THÊM MỚI]
 // ============================================================
  
@@ -153,14 +268,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Gọi hàm tải danh sách lớp vào đúng ID 'classes-grid'
     loadClassesList();
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
             CURRENT_USER_ID = user.uid;
         } else {
             console.log("Đang test chế độ chưa đăng nhập...");
         }
-        renderStudentInfo(user); 
+        renderStudentInfo(user);
+        await loadCompletedExerciseIds(); // [THÊM MỚI] cần có trước để tô xanh bài đã làm + tính tiến độ
         loadDashboardStats();
+        loadMyClassSummary(); // [THÊM MỚI] banner "Lớp đang học": tiến độ / điểm / hạng
     });
 
     // Bắt sự kiện submit form để chấm điểm
@@ -180,6 +297,7 @@ window.goBackToClasses = function() {
 }
  
 window.goBackToDashboard = function() {
+    stopCountdown(); // [THÊM MỚI] dừng đếm ngược nếu thoát làm bài giữa chừng
     document.getElementById('test-section').classList.add('hidden');
     document.getElementById('result-section').classList.add('hidden');
     document.getElementById('dashboard-section').classList.remove('hidden');
@@ -203,24 +321,37 @@ window.loadExercisesForClass = async function(classId, className) {
         querySnapshot.forEach((doc) => {
             availableExercises.push({ id: doc.id, ...doc.data() });
         });
- 
+
+        // [THÊM MỚI] Bài mới nhất lên đầu, cũ hơn xuống dưới. Không dùng orderBy phía
+        // Firestore vì sẽ âm thầm loại bỏ bài thiếu field "createdAt" khỏi kết quả.
+        availableExercises.sort((a, b) => {
+            const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+            const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+            return tb - ta;
+        });
+
         if(availableExercises.length === 0) {
             grid.innerHTML = '<p>Chưa có bài tập nào cho khóa học này.</p>';
             return;
         }
- 
+
         grid.innerHTML = ''; 
         availableExercises.forEach(test => {
             const card = document.createElement('div');
-            card.className = 'card';
+            const isDone = completedExerciseIds.has(test.id); // [THÊM MỚI]
+            card.className = 'card' + (isDone ? ' already-done' : '');
+            const audioBadge = test.audioUrl ? `<span class="meta-chip meta-chip-audio">🎧 Có bài nghe</span>` : '';
+            const doneBadge = isDone ? `<span class="done-badge">✓ Đã hoàn thành</span>` : ''; // [THÊM MỚI]
             card.innerHTML = `
-                <h3>${test.title}</h3>
-                <p class="card-description">${test.description || 'Không có mô tả'}</p>
+                ${doneBadge}
+                <h3>${escapeHtml(test.title || '')}</h3>
+                <p class="card-description">${escapeHtml(test.description || 'Không có mô tả')}</p>
                 <div class="lesson-meta">
                     <span class="meta-chip">📝 ${test.questions ? test.questions.length : 0} câu</span>
                     <span class="meta-chip">⏱ ${test.timeLimit} phút</span>
+                    ${audioBadge}
                 </div>
-                <button class="btn-primary" id="btn-start-${test.id}">Bắt đầu làm bài</button>
+                <button class="btn-primary" id="btn-start-${test.id}">${isDone ? 'Làm lại bài này' : 'Bắt đầu làm bài'}</button>
             `;
             grid.appendChild(card);
             
@@ -233,6 +364,44 @@ window.loadExercisesForClass = async function(classId, className) {
     }
 }
  
+// [THÊM MỚI] Đếm ngược thời gian làm bài — thay cho việc chỉ hiện số phút tĩnh trước đây
+function stopCountdown() {
+    if (countdownIntervalId) {
+        clearInterval(countdownIntervalId);
+        countdownIntervalId = null;
+    }
+    document.getElementById('timer-box')?.classList.remove('timer-warning');
+}
+
+function startCountdown(minutes) {
+    stopCountdown(); // đảm bảo không có bộ đếm cũ nào còn chạy song song
+
+    let remainingSeconds = Math.max(0, Math.round((parseFloat(minutes) || 0) * 60));
+    const timerEl = document.getElementById('timer');
+    const timerBox = document.getElementById('timer-box');
+
+    const render = () => {
+        const m = Math.floor(remainingSeconds / 60).toString().padStart(2, '0');
+        const s = (remainingSeconds % 60).toString().padStart(2, '0');
+        if (timerEl) timerEl.textContent = `${m}:${s}`;
+        if (timerBox) timerBox.classList.toggle('timer-warning', remainingSeconds <= 60 && remainingSeconds > 0);
+    };
+
+    render();
+    countdownIntervalId = setInterval(() => {
+        remainingSeconds--;
+        if (remainingSeconds <= 0) {
+            remainingSeconds = 0;
+            render();
+            stopCountdown();
+            alert('⏰ Đã hết giờ làm bài! Hệ thống sẽ tự động nộp bài cho bạn.');
+            evaluateAndSaveTest();
+            return;
+        }
+        render();
+    }, 1000);
+}
+
 // Bắt đầu làm bài
 function startTest(testId) {
     currentTestSession = availableExercises.find(t => t.id === testId);
@@ -242,13 +411,24 @@ function startTest(testId) {
     document.getElementById('test-section').classList.remove('hidden');
  
     document.getElementById('current-test-title').textContent = currentTestSession.title;
-    document.getElementById('timer').textContent = currentTestSession.timeLimit;
+    startCountdown(currentTestSession.timeLimit); // [THÊM MỚI] đếm ngược thật, tự nộp bài khi hết giờ
     
-    // Gắn dữ liệu cột trái (Bài đọc) - Nếu lấy từ content hoặc description
-    document.getElementById('test-content').innerHTML = currentTestSession.content || `
+    // Gắn dữ liệu cột trái: thanh phát audio (nếu bài có phần nghe) + bài đọc / ngữ liệu
+    const audioHtml = currentTestSession.audioUrl ? `
+        <div class="audio-player-box">
+            <p class="audio-player-label">🎧 Bài nghe (Listening)</p>
+            <audio controls preload="metadata" src="${currentTestSession.audioUrl}">
+                Trình duyệt của bạn không hỗ trợ phát audio. Vui lòng cập nhật trình duyệt để làm bài.
+            </audio>
+        </div>
+    ` : '';
+
+    const passageHtml = currentTestSession.content || `
         <h2>${currentTestSession.title}</h2>
         <p style="white-space: pre-line;">${currentTestSession.description || 'Đọc kỹ các câu hỏi bên phải và điền đáp án chính xác.'}</p>
     `;
+
+    document.getElementById('test-content').innerHTML = audioHtml + passageHtml;
  
     // Render cột phải (Câu hỏi)
     const qContainer = document.getElementById('questions-container');
@@ -280,7 +460,13 @@ function startTest(testId) {
 }
  
 // Chấm điểm và Lưu
+// [THÊM MỚI] Chống nộp bài trùng lặp (hết giờ tự nộp đúng lúc học viên bấm nộp tay)
+let isSubmittingTest = false;
+
 async function evaluateAndSaveTest() {
+    if (isSubmittingTest) return;
+    isSubmittingTest = true;
+    stopCountdown(); // dừng đếm ngược ngay khi bắt đầu nộp bài (nộp tay hoặc hết giờ)
     const submitBtn = document.querySelector('.btn-submit');
     const originalBtnText = submitBtn.textContent;
     submitBtn.textContent = 'Đang chấm điểm & lưu kết quả...';
@@ -339,16 +525,21 @@ async function evaluateAndSaveTest() {
  
     submitBtn.textContent = originalBtnText;
     submitBtn.disabled = false;
- 
+    isSubmittingTest = false; // [THÊM MỚI] reset cờ chống nộp trùng
+
     // Hiển thị giao diện kết quả
     document.getElementById('score-display').textContent = `${percent}%`;
     document.getElementById('mistake-count').textContent = mistakes;
     document.getElementById('detailed-results').innerHTML = htmlDetails;
- 
+
     // [THÊM MỚI] Cập nhật vòng tròn điểm số (score-ring) theo % đạt được
     const ringEl = document.getElementById('score-ring');
     if (ringEl) ringEl.style.setProperty('--pct', percent);
- 
+
+    // [THÊM MỚI] Đánh dấu bài này là "đã hoàn thành" ngay lập tức + làm mới banner lớp đang học
+    completedExerciseIds.add(currentTestSession.id);
+    loadMyClassSummary();
+
     document.getElementById('test-section').classList.add('hidden');
     document.getElementById('result-section').classList.remove('hidden');
     document.getElementById('quiz-form').reset();

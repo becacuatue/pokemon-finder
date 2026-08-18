@@ -41,6 +41,29 @@
             </div>
         </div>
 
+        <!-- Lớp học viên đang theo học — tiến độ / điểm / hạng (được classroom.js điền & ẩn/hiện) -->
+        <div class="my-class-banner hidden" id="my-class-banner">
+            <div class="my-class-info">
+                <p class="welcome-eyebrow">📌 Lớp đang học</p>
+                <h3 id="my-class-name">--</h3>
+                <div class="my-class-progress">
+                    <div class="progress-track"><div class="progress-fill" id="my-class-progress-fill" style="width:0%"></div></div>
+                    <span id="my-class-progress-text">0/0 bài đã làm</span>
+                </div>
+            </div>
+            <div class="my-class-stats">
+                <div class="my-class-stat">
+                    <span class="stat-label">Điểm số</span>
+                    <strong id="my-class-score">0</strong>
+                </div>
+                <div class="my-class-stat">
+                    <span class="stat-label">Xếp hạng</span>
+                    <strong id="my-class-rank">--</strong>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="btn-goto-my-class">Vào học ngay →</button>
+        </div>
+
         <!-- Tổng quan số liệu học tập -->
         <div class="stats-overview">
             <div class="summary-card">
@@ -63,19 +86,7 @@
         <p class="section-sub">Chọn khóa học phù hợp với mục tiêu của bạn để bắt đầu luyện tập ngay hôm nay.</p>
 
         <div id="classes-grid" class="grid">
-            <!-- Mặc định giả lập 3 lớp nếu bạn chưa tạo bảng classes trên Firebase -->
-            <div class="card" onclick="loadExercisesForClass('ielts', 'Luyện thi IELTS')">
-                <h3>📖 Luyện thi IELTS</h3>
-                <p>Bài tập chuyên sâu IELTS Reading &amp; Listening</p>
-            </div>
-            <div class="card" onclick="loadExercisesForClass('toeic', 'Luyện thi TOEIC')">
-                <h3>💼 Luyện thi TOEIC</h3>
-                <p>Bài tập Toeic format mới</p>
-            </div>
-            <div class="card" onclick="loadExercisesForClass('tienganhgiaotiep', 'Tiếng Anh Giao Tiếp')">
-                <h3>🗣️ Tiếng Anh Giao Tiếp</h3>
-                <p>Từ vựng &amp; Mẫu câu thông dụng</p>
-            </div>
+            <p>Đang tải danh sách lớp học...</p>
         </div>
 
         <div class="stats-cta">
@@ -102,7 +113,7 @@
                 <button class="btn-back" onclick="goBackToDashboard()">&#8592; Thoát</button>
                 <h3 id="current-test-title">Đang tải...</h3>
             </div>
-            <div class="timer">⏱ <span id="timer">00:00</span> phút</div>
+            <div class="timer" id="timer-box">⏱ <span id="timer">00:00</span></div>
         </div>
 
         <div class="test-split-view">

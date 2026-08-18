@@ -265,6 +265,50 @@ label:focus-within{
   .welcome-bar{ flex-direction:column; align-items:flex-start; text-align:left; }
 }
  
+/* [THÊM MỚI] Banner "Lớp đang học" — tiến độ / điểm / hạng của học viên trong lớp thật */
+.my-class-banner{
+  display:flex;
+  align-items:center;
+  gap:24px;
+  flex-wrap:wrap;
+  padding:20px 26px;
+  border-radius:var(--radius-m);
+  background:var(--surface-tint);
+  border:1.5px solid var(--matcha-primary-light);
+  margin-bottom:28px;
+}
+.my-class-info{ flex:1; min-width:220px; }
+.my-class-info h3{ margin:2px 0 10px; font-size:18px; color:var(--text-dark); }
+.my-class-progress{ display:flex; align-items:center; gap:12px; }
+.progress-track{
+  flex:1; max-width:220px;
+  height:8px; border-radius:99px;
+  background:var(--border-color);
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%; border-radius:99px;
+  background:linear-gradient(90deg, var(--matcha-primary), var(--matcha-primary-dark));
+  transition:width .5s ease;
+}
+#my-class-progress-text{ font-size:12.5px; color:var(--text-muted); font-weight:600; white-space:nowrap; }
+
+.my-class-stats{ display:flex; gap:22px; flex:none; }
+.my-class-stat{ text-align:center; }
+.my-class-stat .stat-label{
+  display:block; font-size:11px; color:var(--text-muted);
+  margin-bottom:4px; text-transform:uppercase; letter-spacing:.04em;
+}
+.my-class-stat strong{ font-size:21px; color:var(--matcha-primary-dark); }
+
+#btn-goto-my-class{ flex:none; white-space:nowrap; }
+
+@media (max-width:700px){
+  .my-class-banner{ flex-direction:column; align-items:stretch; }
+  .my-class-stats{ justify-content:space-around; }
+  .progress-track{ max-width:none; }
+}
+
 /* ---------- 5. STATS OVERVIEW (mini tổng quan trên trang chọn khóa) ---------- */
 .stats-overview{
   display:grid;
@@ -331,12 +375,7 @@ label:focus-within{
   box-shadow:var(--shadow-soft);
   transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   overflow:hidden;
-}
-.card-description {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
+  max-height: 200px;
 }
 .card::before{
   content:"";
@@ -382,6 +421,22 @@ label:focus-within{
   border-radius:var(--radius-pill);
   background:var(--matcha-badge-bg);
   color:var(--matcha-badge-text);
+}
+.meta-chip-audio{ background:var(--stat-blue-bg); color:var(--stat-blue); }
+
+/* [THÊM MỚI] Thẻ bài tập ĐÃ HOÀN THÀNH — tô xanh nhạt để dễ phân biệt */
+.card.already-done{
+  background:var(--success-bg);
+  border-color:#BEE0C6;
+}
+.card.already-done::before{ background:var(--success); transform:scaleX(1); }
+.done-badge{
+  position:absolute; top:14px; right:14px;
+  font-size:11px; font-weight:700;
+  padding:4px 10px;
+  border-radius:var(--radius-pill);
+  background:var(--success);
+  color:var(--white);
 }
  
 /* Nút xem thống kê */
@@ -458,6 +513,16 @@ label:focus-within{
   align-items:center;
   gap:8px;
   white-space:nowrap;
+  transition:background .2s ease;
+}
+/* [THÊM MỚI] Nhấp nháy cảnh báo khi còn <= 60 giây */
+.timer.timer-warning{
+  background:var(--danger);
+  animation:timer-pulse 1s ease-in-out infinite;
+}
+@keyframes timer-pulse{
+  0%, 100% { opacity:1; }
+  50% { opacity:.6; }
 }
 #timer{ font-variant-numeric:tabular-nums; }
  
@@ -473,6 +538,26 @@ label:focus-within{
   font-size:15.5px;
 }
 .passage-panel h2{ font-size:20px; }
+
+/* [THÊM MỚI] Khung phát audio bài nghe (Listening) */
+.audio-player-box{
+  background:var(--white);
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-m);
+  padding:16px 18px;
+  margin-bottom:22px;
+  box-shadow:var(--shadow-soft);
+}
+.audio-player-label{
+  font-size:13px;
+  font-weight:700;
+  color:var(--matcha-primary-dark);
+  margin:0 0 10px;
+}
+.audio-player-box audio{
+  width:100%;
+  height:38px;
+}
  
 .questions-panel{
   flex:1;
