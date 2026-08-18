@@ -423,7 +423,7 @@ function startTest(testId) {
         </div>
     ` : '';
 
-    const passageHtml = currentTestSession.content || `
+    const passageHtml = `<p style="white-space: pre-line;">${currentTestSession.content || 'Đọc kỹ các câu hỏi bên phải và điền đáp án chính xác.'}</p>` || `
         <h2>${currentTestSession.title}</h2>
         <p style="white-space: pre-line;">${currentTestSession.description || 'Đọc kỹ các câu hỏi bên phải và điền đáp án chính xác.'}</p>
     `;
