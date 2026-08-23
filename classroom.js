@@ -413,15 +413,32 @@ function startTest(testId) {
     document.getElementById('current-test-title').textContent = currentTestSession.title;
     startCountdown(currentTestSession.timeLimit); // [THÊM MỚI] đếm ngược thật, tự nộp bài khi hết giờ
     
-    // Gắn dữ liệu cột trái: thanh phát audio (nếu bài có phần nghe) + bài đọc / ngữ liệu
-    const audioHtml = currentTestSession.audioUrl ? `
-        <div class="audio-player-box">
-            <p class="audio-player-label">🎧 Bài nghe (Listening)</p>
-            <audio controls preload="metadata" src="${currentTestSession.audioUrl}">
-                Trình duyệt của bạn không hỗ trợ phát audio. Vui lòng cập nhật trình duyệt để làm bài.
-            </audio>
-        </div>
-    ` : '';
+    let audioHtml = '';
+    if (currentTestSession.audioParts && currentTestSession.audioParts.length > 0) {
+        currentTestSession.audioParts.forEach(part => {
+            if (part.audioUrl) {
+                audioHtml += `
+                    <div class="audio-player-box">
+                        <p class="audio-player-label">🎧 ${escapeHtml(part.label || 'Bài nghe (Listening)')}</p>
+                        <audio controls preload="metadata" src="${part.audioUrl}">
+                            Trình duyệt của bạn không hỗ trợ phát audio. Vui lòng cập nhật trình duyệt để làm bài.
+                        </audio>
+                    </div>
+                `;
+            }
+        });
+    } 
+    // 2. Tương thích ngược: Đọc định dạng cũ nếu bài tập chỉ có trường audioUrl đơn lẻ
+    else if (currentTestSession.audioUrl) {
+        audioHtml = `
+            <div class="audio-player-box">
+                <p class="audio-player-label">🎧 Bài nghe (Listening)</p>
+                <audio controls preload="metadata" src="${currentTestSession.audioUrl}">
+                    Trình duyệt của bạn không hỗ trợ phát audio. Vui lòng cập nhật trình duyệt để làm bài.
+                </audio>
+            </div>
+        `;
+    }
 
     const passageHtml = `<p style="white-space: pre-line;">${currentTestSession.content || 'Đọc kỹ các câu hỏi bên phải và điền đáp án chính xác.'}</p>` || `
         <h2>${currentTestSession.title}</h2>
