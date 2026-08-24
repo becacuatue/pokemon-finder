@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lớp học của tôi · DTEdu</title>
     <link rel="stylesheet" href="classroom.css">
+    <link rel="stylesheet" href="vocab.css">
 </head>
 <body>
 
@@ -62,6 +63,24 @@
                 </div>
             </div>
             <button class="btn btn-primary" id="btn-goto-my-class">Vào học ngay →</button>
+        </div>
+
+        <!-- ================= LUYỆN TẬP TỪ VỰNG (module riêng biệt) =================
+             Thẻ giới thiệu: chọn cấp độ để mở khu vực luyện tập từ vựng độc lập
+             (#vocab-practice-section bên dưới trang). Toàn bộ logic nằm ở vocab.js,
+             dữ liệu từ vựng nằm ở vocab-data.json — không phụ thuộc Firebase. -->
+        <div class="vocab-teaser" id="vocab-teaser">
+            <div class="vocab-teaser-info">
+                <h3>Luyện từ vựng theo cấp độ</h3>
+                <p class="vocab-teaser-sub">Nghe phát âm chuẩn, chọn nghĩa đúng trong 4 đáp án và ghi điểm — từ càng dài, điểm càng cao!</p>
+                <div class="vocab-teaser-stats">
+                    <span><strong id="vocab-total-points">0</strong>điểm tích lũy</span>
+                    <span><strong id="vocab-total-words">0</strong>từ đã thuộc</span>
+                </div>
+            </div>
+            <div class="vocab-level-picker" id="vocab-level-picker">
+                <p style="font-size:13px;color:var(--text-muted);">Đang tải các cấp độ...</p>
+            </div>
         </div>
 
         <!-- Tổng quan số liệu học tập -->
@@ -189,10 +208,84 @@
         </div>
     </section>
 
+    <!-- ================= LUYỆN TẬP TỪ VỰNG — KHU VỰC LÀM BÀI ================= -->
+    <section id="vocab-practice-section" class="container panel-card hidden">
+        <button class="btn-back" onclick="exitVocabPractice()">&#8592; Thoát luyện tập</button>
+
+        <div class="vocab-practice-header">
+            <span class="vocab-level-badge" id="vocab-current-level-badge">--</span>
+            <div class="vocab-live-stats">
+                <div class="vocab-live-stat">
+                    <span class="stat-label">Điểm phiên này</span>
+                    <strong id="vocab-session-points">0</strong>
+                </div>
+                <div class="vocab-live-stat">
+                    <span class="stat-label">Chuỗi đúng</span>
+                    <strong id="vocab-streak">0 </strong>
+                </div>
+                <div class="vocab-live-stat">
+                    <span class="stat-label">Độ chính xác</span>
+                    <strong id="vocab-accuracy">0%</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="vocab-card" id="vocab-card">
+            <div class="vocab-word-row">
+                <h2 id="vocab-word">--</h2>
+                <button type="button" class="vocab-speak-btn" id="vocab-speak-btn" title="Nghe phát âm">🔊</button>
+            </div>
+            <p class="vocab-phonetic" id="vocab-phonetic"></p>
+
+            <div class="vocab-accent-toggle">
+                <label><input type="radio" name="vocab-accent" value="en-US" checked> 🇺🇸 Giọng Mỹ (en-US)</label>
+                <label><input type="radio" name="vocab-accent" value="en-GB"> 🇬🇧 Giọng Anh (en-GB)</label>
+            </div>
+
+            <div class="vocab-options" id="vocab-options">
+                <!-- 4 đáp án render từ vocab.js -->
+            </div>
+
+            <div class="vocab-feedback hidden" id="vocab-feedback">
+                <p class="vocab-feedback-text" id="vocab-feedback-text"></p>
+                <p class="vocab-example" id="vocab-example"></p>
+            </div>
+
+            <button type="button" class="btn btn-primary vocab-next-btn hidden" id="vocab-next-btn">Từ tiếp theo →</button>
+        </div>
+
+        <div class="vocab-performance">
+            <h3> Hiệu suất luyện tập</h3>
+            <div class="vocab-performance-grid">
+                <div class="vocab-ring-box">
+                    <div class="score-ring" id="vocab-score-ring"><span id="vocab-ring-text">0%</span></div>
+                    <p>Độ chính xác phiên này</p>
+                </div>
+                <div class="vocab-bars">
+                    <div class="vocab-bar-row">
+                        <span class="vocab-bar-label">Đúng</span>
+                        <div class="vocab-bar-track"><div class="vocab-bar-fill correct" id="vocab-bar-correct-fill"></div></div>
+                        <span class="vocab-bar-value" id="vocab-bar-correct-value">0</span>
+                    </div>
+                    <div class="vocab-bar-row">
+                        <span class="vocab-bar-label">Sai</span>
+                        <div class="vocab-bar-track"><div class="vocab-bar-fill wrong" id="vocab-bar-wrong-fill"></div></div>
+                        <span class="vocab-bar-value" id="vocab-bar-wrong-value">0</span>
+                    </div>
+                </div>
+                <div class="vocab-history">
+                    <p class="vocab-history-label"> Lịch sử trả lời gần đây</p>
+                    <div class="vocab-history-dots" id="vocab-history-dots"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer class="site-footer">
         <p>© 2026 <strong>DTEdu</strong> — Nền tảng học tiếng Anh được thiết kế riêng cho bạn.</p>
     </footer>
 
     <script type="module" src="classroom.js"></script>
+    <script type="module" src="vocab.js"></script>
 </body>
 </html>

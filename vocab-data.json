@@ -1,0 +1,549 @@
+{
+  "levels": [
+    {
+      "id": "a1",
+      "label": "A1 · Mới bắt đầu",
+      "description": "Từ vựng cơ bản, dùng hằng ngày",
+      "color": "#7EA88A",
+      "pointMultiplier": 1,
+      "words": [
+        { "id": "a1-01", "word": "apple",  "phonetic": "/ˈæp.əl/",   "partOfSpeech": "danh từ", "meaning": "quả táo",     "example": "She eats an apple every morning.",        "exampleTranslation": "Cô ấy ăn một quả táo mỗi buổi sáng." },
+        { "id": "a1-02", "word": "book",   "phonetic": "/bʊk/",      "partOfSpeech": "danh từ", "meaning": "quyển sách",  "example": "He is reading a book in the library.",    "exampleTranslation": "Anh ấy đang đọc sách trong thư viện." },
+        { "id": "a1-03", "word": "water",  "phonetic": "/ˈwɔː.tər/", "partOfSpeech": "danh từ", "meaning": "nước",       "example": "Please drink more water every day.",      "exampleTranslation": "Hãy uống nhiều nước hơn mỗi ngày." },
+        { "id": "a1-04", "word": "happy",  "phonetic": "/ˈhæp.i/",   "partOfSpeech": "tính từ", "meaning": "vui vẻ",      "example": "The children look very happy today.",     "exampleTranslation": "Bọn trẻ trông rất vui vẻ hôm nay." },
+        { "id": "a1-05", "word": "run",    "phonetic": "/rʌn/",      "partOfSpeech": "động từ", "meaning": "chạy",       "example": "I run in the park every morning.",        "exampleTranslation": "Tôi chạy bộ trong công viên mỗi sáng." },
+        { "id": "a1-06", "word": "house",  "phonetic": "/haʊs/",     "partOfSpeech": "danh từ", "meaning": "ngôi nhà",    "example": "Their house is near the school.",         "exampleTranslation": "Nhà của họ ở gần trường học." },
+        { "id": "a1-07", "word": "friend", "phonetic": "/frend/",    "partOfSpeech": "danh từ", "meaning": "bạn bè",      "example": "She is my best friend at school.",        "exampleTranslation": "Cô ấy là bạn thân nhất của tôi ở trường." },
+        { "id": "a1-08", "word": "eat",    "phonetic": "/iːt/",      "partOfSpeech": "động từ", "meaning": "ăn",         "example": "We eat dinner together at seven.",        "exampleTranslation": "Chúng tôi ăn tối cùng nhau lúc bảy giờ." },
+        { "id": "a1-09", "word": "big",    "phonetic": "/bɪɡ/",      "partOfSpeech": "tính từ", "meaning": "to lớn",      "example": "That is a very big dog.",                 "exampleTranslation": "Đó là một con chó rất to." },
+        { "id": "a1-10", "word": "school", "phonetic": "/skuːl/",    "partOfSpeech": "danh từ", "meaning": "trường học",  "example": "My school starts at seven thirty.",       "exampleTranslation": "Trường của tôi bắt đầu lúc bảy giờ ba mươi." }
+      ]
+    },
+    {
+      "id": "a2",
+      "label": "A2 · Sơ cấp",
+      "description": "Giao tiếp tình huống quen thuộc",
+      "color": "#3F72AF",
+      "pointMultiplier": 1.3,
+      "words": [
+        { "id": "a2-01", "word": "weather",   "phonetic": "/ˈweð.ər/",     "partOfSpeech": "danh từ", "meaning": "thời tiết",   "example": "The weather is really nice this weekend.",   "exampleTranslation": "Thời tiết cuối tuần này thực sự đẹp." },
+        { "id": "a2-02", "word": "travel",    "phonetic": "/ˈtræv.əl/",   "partOfSpeech": "động từ", "meaning": "du lịch",     "example": "We plan to travel to Da Nang next month.",   "exampleTranslation": "Chúng tôi định đi du lịch Đà Nẵng vào tháng sau." },
+        { "id": "a2-03", "word": "holiday",   "phonetic": "/ˈhɒl.ə.deɪ/", "partOfSpeech": "danh từ", "meaning": "kỳ nghỉ",     "example": "I can't wait for the summer holiday.",       "exampleTranslation": "Tôi rất mong chờ kỳ nghỉ hè." },
+        { "id": "a2-04", "word": "kitchen",   "phonetic": "/ˈkɪtʃ.ɪn/",   "partOfSpeech": "danh từ", "meaning": "nhà bếp",     "example": "My mother is cooking in the kitchen.",       "exampleTranslation": "Mẹ tôi đang nấu ăn trong bếp." },
+        { "id": "a2-05", "word": "borrow",    "phonetic": "/ˈbɒr.əʊ/",    "partOfSpeech": "động từ", "meaning": "mượn",       "example": "Can I borrow your pen for a minute?",        "exampleTranslation": "Tôi mượn bút của bạn một lát được không?" },
+        { "id": "a2-06", "word": "crowded",   "phonetic": "/ˈkraʊ.dɪd/",  "partOfSpeech": "tính từ", "meaning": "đông đúc",    "example": "The bus was very crowded this morning.",     "exampleTranslation": "Xe buýt sáng nay rất đông đúc." },
+        { "id": "a2-07", "word": "neighbor",  "phonetic": "/ˈneɪ.bər/",   "partOfSpeech": "danh từ", "meaning": "hàng xóm",    "example": "Our neighbor is a very kind old man.",       "exampleTranslation": "Hàng xóm của chúng tôi là một ông cụ rất tốt bụng." },
+        { "id": "a2-08", "word": "exercise",  "phonetic": "/ˈek.sə.saɪz/", "partOfSpeech": "động từ", "meaning": "tập thể dục", "example": "You should exercise three times a week.",    "exampleTranslation": "Bạn nên tập thể dục ba lần một tuần." },
+        { "id": "a2-09", "word": "delicious", "phonetic": "/dɪˈlɪʃ.əs/",  "partOfSpeech": "tính từ", "meaning": "ngon miệng",  "example": "This soup smells absolutely delicious.",     "exampleTranslation": "Món súp này ngửi thấy thơm ngon tuyệt." },
+        { "id": "a2-10", "word": "hospital",  "phonetic": "/ˈhɒs.pɪ.təl/","partOfSpeech": "danh từ", "meaning": "bệnh viện",   "example": "He works as a nurse at the hospital.",       "exampleTranslation": "Anh ấy làm y tá tại bệnh viện." }
+      ]
+    },
+    {
+      "id": "b1",
+      "label": "B1 · Trung cấp",
+      "description": "Diễn đạt ý kiến, kinh nghiệm rõ ràng",
+      "color": "#C97A2E",
+      "pointMultiplier": 1.6,
+      "words": [
+        { "id": "b1-01", "word": "environment",  "phonetic": "/ɪnˈvaɪ.rən.mənt/", "partOfSpeech": "danh từ", "meaning": "môi trường",      "example": "We must protect the environment for the future.", "exampleTranslation": "Chúng ta phải bảo vệ môi trường cho tương lai." },
+        { "id": "b1-02", "word": "achievement",  "phonetic": "/əˈtʃiːv.mənt/",    "partOfSpeech": "danh từ", "meaning": "thành tựu",       "example": "Winning the prize was a great achievement.",       "exampleTranslation": "Giành được giải thưởng là một thành tựu lớn." },
+        { "id": "b1-03", "word": "opportunity",  "phonetic": "/ˌɒp.əˈtʃuː.nə.ti/","partOfSpeech": "danh từ", "meaning": "cơ hội",         "example": "This job is a great opportunity for her.",         "exampleTranslation": "Công việc này là một cơ hội tuyệt vời cho cô ấy." },
+        { "id": "b1-04", "word": "describe",     "phonetic": "/dɪˈskraɪb/",       "partOfSpeech": "động từ", "meaning": "miêu tả",        "example": "Can you describe your ideal house?",               "exampleTranslation": "Bạn có thể miêu tả ngôi nhà mơ ước của mình không?" },
+        { "id": "b1-05", "word": "reliable",     "phonetic": "/rɪˈlaɪ.ə.bəl/",    "partOfSpeech": "tính từ", "meaning": "đáng tin cậy",    "example": "She is a very reliable colleague.",                "exampleTranslation": "Cô ấy là một đồng nghiệp rất đáng tin cậy." },
+        { "id": "b1-06", "word": "immediately",  "phonetic": "/ɪˈmiː.di.ət.li/",  "partOfSpeech": "trạng từ", "meaning": "ngay lập tức",   "example": "Please call me back immediately.",                 "exampleTranslation": "Hãy gọi lại cho tôi ngay lập tức." },
+        { "id": "b1-07", "word": "improvement",  "phonetic": "/ɪmˈpruːv.mənt/",   "partOfSpeech": "danh từ", "meaning": "sự cải thiện",    "example": "There has been a big improvement in his English.","exampleTranslation": "Đã có sự cải thiện lớn trong tiếng Anh của anh ấy." },
+        { "id": "b1-08", "word": "relationship",  "phonetic": "/rɪˈleɪ.ʃən.ʃɪp/",  "partOfSpeech": "danh từ", "meaning": "mối quan hệ",     "example": "They have a close relationship with their teacher.", "exampleTranslation": "Họ có mối quan hệ thân thiết với giáo viên." },
+        { "id": "b1-09", "word": "experience",   "phonetic": "/ɪkˈspɪə.ri.əns/",  "partOfSpeech": "danh từ", "meaning": "kinh nghiệm",     "example": "Living abroad was a valuable experience.",         "exampleTranslation": "Sống ở nước ngoài là một kinh nghiệm quý giá." },
+        { "id": "b1-10", "word": "confident",    "phonetic": "/ˈkɒn.fɪ.dənt/",    "partOfSpeech": "tính từ", "meaning": "tự tin",          "example": "He felt confident before the interview.",          "exampleTranslation": "Anh ấy cảm thấy tự tin trước buổi phỏng vấn." }
+      ]
+    },
+    {
+      "id": "b2",
+      "label": "B2 · Trên trung cấp",
+      "description": "Tranh luận, phân tích chủ đề học thuật",
+      "color": "#8B5FBF",
+      "pointMultiplier": 2,
+      "words": [
+        { "id": "b2-01", "word": "significant",   "phonetic": "/sɪɡˈnɪf.ɪ.kənt/",   "partOfSpeech": "tính từ", "meaning": "đáng kể",           "example": "There was a significant rise in sales this year.", "exampleTranslation": "Có sự gia tăng đáng kể trong doanh số năm nay." },
+        { "id": "b2-02", "word": "approximately", "phonetic": "/əˈprɒk.sɪ.mət.li/", "partOfSpeech": "trạng từ", "meaning": "xấp xỉ",           "example": "The trip takes approximately three hours.",         "exampleTranslation": "Chuyến đi mất xấp xỉ ba giờ." },
+        { "id": "b2-03", "word": "perspective",   "phonetic": "/pəˈspek.tɪv/",      "partOfSpeech": "danh từ", "meaning": "quan điểm",         "example": "Try to see the problem from her perspective.",      "exampleTranslation": "Hãy thử nhìn vấn đề theo quan điểm của cô ấy." },
+        { "id": "b2-04", "word": "consequence",   "phonetic": "/ˈkɒn.sɪ.kwəns/",    "partOfSpeech": "danh từ", "meaning": "hậu quả",          "example": "Every action has a consequence.",                   "exampleTranslation": "Mọi hành động đều có hậu quả." },
+        { "id": "b2-05", "word": "accomplish",    "phonetic": "/əˈkʌm.plɪʃ/",       "partOfSpeech": "động từ", "meaning": "hoàn thành",        "example": "We accomplished the project ahead of schedule.",    "exampleTranslation": "Chúng tôi hoàn thành dự án trước thời hạn." },
+        { "id": "b2-06", "word": "controversial", "phonetic": "/ˌkɒn.trəˈvɜː.ʃəl/", "partOfSpeech": "tính từ", "meaning": "gây tranh cãi",     "example": "It is a highly controversial topic.",               "exampleTranslation": "Đó là một chủ đề gây tranh cãi cao." },
+        { "id": "b2-07", "word": "inevitable",    "phonetic": "/ɪˈnev.ɪ.tə.bəl/",   "partOfSpeech": "tính từ", "meaning": "không thể tránh khỏi", "example": "Change in technology is inevitable.",            "exampleTranslation": "Sự thay đổi trong công nghệ là điều không thể tránh khỏi." },
+        { "id": "b2-08", "word": "contribute",    "phonetic": "/kənˈtrɪb.juːt/",    "partOfSpeech": "động từ", "meaning": "đóng góp",          "example": "Everyone can contribute new ideas.",                "exampleTranslation": "Mọi người đều có thể đóng góp ý tưởng mới." },
+        { "id": "b2-09", "word": "sustainable",   "phonetic": "/səˈsteɪ.nə.bəl/",   "partOfSpeech": "tính từ", "meaning": "bền vững",          "example": "The company invests in sustainable energy.",        "exampleTranslation": "Công ty đầu tư vào năng lượng bền vững." },
+        { "id": "b2-10", "word": "phenomenon",    "phonetic": "/fəˈnɒm.ɪ.nən/",     "partOfSpeech": "danh từ", "meaning": "hiện tượng",        "example": "Global warming is a worrying phenomenon.",          "exampleTranslation": "Nóng lên toàn cầu là một hiện tượng đáng lo ngại." },
+        {
+          "id": "b2-11",
+          "word": "adequate",
+          "phonetic": "/ˈæd.ə.kwət/",
+          "partOfSpeech": "tính từ",
+          "meaning": "đầy đủ, thỏa đáng",
+          "example": "The space available is not adequate for our needs.",
+          "exampleTranslation": "Không gian có sẵn không đủ cho nhu cầu của chúng ta."
+        },
+        {
+          "id": "b2-12",
+          "word": "adjustment",
+          "phonetic": "/əˈdʒʌst.mənt/",
+          "partOfSpeech": "danh từ",
+          "meaning": "sự điều chỉnh",
+          "example": "She made a few minor adjustments to the focus of her camera.",
+          "exampleTranslation": "Cô ấy đã thực hiện một vài điều chỉnh nhỏ đối với tiêu cự máy ảnh của mình."
+        },
+        {
+          "id": "b2-13",
+          "word": "allocate",
+          "phonetic": "/ˈæl.ə.keɪt/",
+          "partOfSpeech": "động từ",
+          "meaning": "phân bổ",
+          "example": "The government is allocating funds for health education.",
+          "exampleTranslation": "Chính phủ đang phân bổ quỹ cho giáo dục sức khỏe."
+        },
+        {
+          "id": "b2-14",
+          "word": "alter",
+          "phonetic": "/ˈɒl.tər/",
+          "partOfSpeech": "động từ",
+          "meaning": "thay đổi, biến đổi",
+          "example": "We've had to alter some of our plans.",
+          "exampleTranslation": "Chúng tôi đã phải thay đổi một số kế hoạch của mình."
+        },
+        {
+          "id": "b2-15",
+          "word": "alternative",
+          "phonetic": "/ɒlˈtɜː.nə.tɪv/",
+          "partOfSpeech": "danh từ",
+          "meaning": "sự thay thế, phương án thay thế",
+          "example": "We had no alternative but to fire him.",
+          "exampleTranslation": "Chúng tôi không có lựa chọn nào khác ngoài việc sa thải anh ta."
+        },
+        {
+          "id": "b2-16",
+          "word": "anticipate",
+          "phonetic": "/ænˈtɪs.ɪ.peɪt/",
+          "partOfSpeech": "động từ",
+          "meaning": "dự đoán, lường trước",
+          "example": "We don't anticipate any trouble.",
+          "exampleTranslation": "Chúng tôi không lường trước bất kỳ rắc rối nào."
+        },
+        {
+          "id": "b2-17",
+          "word": "apparent",
+          "phonetic": "/əˈpær.ənt/",
+          "partOfSpeech": "tính từ",
+          "meaning": "rõ ràng, bề ngoài",
+          "example": "Her unhappiness was apparent to everyone.",
+          "exampleTranslation": "Sự bất hạnh của cô ấy là rõ ràng với mọi người."
+        },
+        {
+          "id": "b2-18",
+          "word": "approach",
+          "phonetic": "/əˈprəʊtʃ/",
+          "partOfSpeech": "danh từ",
+          "meaning": "phương pháp, sự tiếp cận",
+          "example": "We need a whole new approach to the job.",
+          "exampleTranslation": "Chúng ta cần một phương pháp tiếp cận hoàn toàn mới cho công việc."
+        },
+        {
+          "id": "b2-19",
+          "word": "appropriate",
+          "phonetic": "/əˈprəʊ.pri.ət/",
+          "partOfSpeech": "tính từ",
+          "meaning": "phù hợp, thích hợp",
+          "example": "Is this film appropriate for small children?",
+          "exampleTranslation": "Bộ phim này có phù hợp với trẻ nhỏ không?"
+        },
+        {
+          "id": "b2-20",
+          "word": "approximately",
+          "phonetic": "/əˈprɒk.sɪ.mət.li/",
+          "partOfSpeech": "trạng từ",
+          "meaning": "khoảng chừng, xấp xỉ",
+          "example": "The job will take approximately three weeks.",
+          "exampleTranslation": "Công việc sẽ mất khoảng ba tuần."
+        },
+        {
+          "id": "b2-21",
+          "word": "aspect",
+          "phonetic": "/ˈæs.pekt/",
+          "partOfSpeech": "danh từ",
+          "meaning": "khía cạnh",
+          "example": "Which aspect of the job do you most enjoy?",
+          "exampleTranslation": "Bạn thích nhất khía cạnh nào của công việc?"
+        },
+        {
+          "id": "b2-22",
+          "word": "assess",
+          "phonetic": "/əˈses/",
+          "partOfSpeech": "động từ",
+          "meaning": "đánh giá",
+          "example": "Examiners will assess the candidates' speaking skills.",
+          "exampleTranslation": "Các giám khảo sẽ đánh giá kỹ năng nói của ứng viên."
+        },
+        {
+          "id": "b2-23",
+          "word": "assign",
+          "phonetic": "/əˈsaɪn/",
+          "partOfSpeech": "động từ",
+          "meaning": "phân công, giao phó",
+          "example": "UN troops were assigned the task of rebuilding the hospital.",
+          "exampleTranslation": "Lực lượng Liên Hợp Quốc được giao nhiệm vụ xây dựng lại bệnh viện."
+        },
+        {
+          "id": "b2-24",
+          "word": "assist",
+          "phonetic": "/əˈsɪst/",
+          "partOfSpeech": "động từ",
+          "meaning": "hỗ trợ, giúp đỡ",
+          "example": "The army arrived to assist in the search.",
+          "exampleTranslation": "Quân đội đã đến để hỗ trợ việc tìm kiếm."
+        },
+        {
+          "id": "b2-25",
+          "word": "assume",
+          "phonetic": "/əˈsjuːm/",
+          "partOfSpeech": "động từ",
+          "meaning": "cho rằng, giả định",
+          "example": "I assumed that you knew each other.",
+          "exampleTranslation": "Tôi cho rằng các bạn đã biết nhau."
+        },
+        {
+          "id": "b2-26",
+          "word": "attach",
+          "phonetic": "/əˈtætʃ/",
+          "partOfSpeech": "động từ",
+          "meaning": "đính kèm, gắn vào",
+          "example": "I attached a photo to my application form.",
+          "exampleTranslation": "Tôi đã đính kèm một bức ảnh vào đơn đăng ký của mình."
+        },
+        {
+          "id": "b2-27",
+          "word": "awareness",
+          "phonetic": "/əˈweə.nəs/",
+          "partOfSpeech": "danh từ",
+          "meaning": "sự nhận thức",
+          "example": "Public awareness of the problem will make politicians take it seriously.",
+          "exampleTranslation": "Sự nhận thức của công chúng về vấn đề sẽ khiến các chính trị gia xem xét nó một cách nghiêm túc."
+        },
+        {
+          "id": "b2-28",
+          "word": "barrier",
+          "phonetic": "/ˈbær.i.ər/",
+          "partOfSpeech": "danh từ",
+          "meaning": "rào cản",
+          "example": "Despite the language barrier, they soon became good friends.",
+          "exampleTranslation": "Bất chấp rào cản ngôn ngữ, họ sớm trở thành những người bạn tốt."
+        },
+        {
+          "id": "b2-29",
+          "word": "benefit",
+          "phonetic": "/ˈben.ɪ.fɪt/",
+          "partOfSpeech": "danh từ",
+          "meaning": "lợi ích",
+          "example": "The discovery of oil brought many benefits to the town.",
+          "exampleTranslation": "Việc phát hiện ra dầu mỏ đã mang lại nhiều lợi ích cho thị trấn."
+        },
+        {
+          "id": "b2-30",
+          "word": "border",
+          "phonetic": "/ˈbɔː.dər/",
+          "partOfSpeech": "danh từ",
+          "meaning": "biên giới",
+          "example": "The train crosses the border between France and Spain.",
+          "exampleTranslation": "Chuyến tàu vượt qua biên giới giữa Pháp và Tây Ban Nha."
+        },
+        {
+          "id": "b2-31",
+          "word": "brief",
+          "phonetic": "/briːf/",
+          "partOfSpeech": "tính từ",
+          "meaning": "ngắn gọn",
+          "example": "I had a brief look at her report before the meeting.",
+          "exampleTranslation": "Tôi đã xem lướt qua (ngắn gọn) báo cáo của cô ấy trước cuộc họp."
+        },
+        {
+          "id": "b2-32",
+          "word": "broad",
+          "phonetic": "/brɔːd/",
+          "partOfSpeech": "tính từ",
+          "meaning": "rộng, bao quát",
+          "example": "We are aiming at a broad range of customers.",
+          "exampleTranslation": "Chúng tôi đang nhắm đến một lượng lớn khách hàng đa dạng."
+        },
+        {
+          "id": "b2-33",
+          "word": "calculation",
+          "phonetic": "/ˌkæl.kjəˈleɪ.ʃən/",
+          "partOfSpeech": "danh từ",
+          "meaning": "sự tính toán",
+          "example": "The calculations that you did contained a few errors.",
+          "exampleTranslation": "Các tính toán mà bạn đã làm có chứa một vài lỗi."
+        },
+        {
+          "id": "b2-34",
+          "word": "campaign",
+          "phonetic": "/kæmˈpeɪn/",
+          "partOfSpeech": "danh từ",
+          "meaning": "chiến dịch",
+          "example": "The protests were part of their campaign to protect the environment.",
+          "exampleTranslation": "Các cuộc biểu tình là một phần trong chiến dịch của họ để bảo vệ môi trường."
+        },
+        {
+          "id": "b2-35",
+          "word": "capability",
+          "phonetic": "/ˌkeɪ.pəˈbɪl.ə.ti/",
+          "partOfSpeech": "danh từ",
+          "meaning": "khả năng, năng lực",
+          "example": "These tests are beyond the capability of an average student.",
+          "exampleTranslation": "Những bài kiểm tra này vượt quá khả năng của một học sinh trung bình."
+        },
+        {
+          "id": "b2-36",
+          "word": "capacity",
+          "phonetic": "/kəˈpæs.ə.ti/",
+          "partOfSpeech": "danh từ",
+          "meaning": "sức chứa, dung lượng",
+          "example": "The stadium has a seating capacity of 50,000.",
+          "exampleTranslation": "Sân vận động có sức chứa 50,000 chỗ ngồi."
+        },
+        {
+          "id": "b2-37",
+          "word": "category",
+          "phonetic": "/ˈkæt.ə.ɡri/",
+          "partOfSpeech": "danh từ",
+          "meaning": "hạng mục, thể loại",
+          "example": "There are three categories of accommodation in the hotel.",
+          "exampleTranslation": "Có ba hạng mục phòng ở trong khách sạn."
+        },
+        {
+          "id": "b2-38",
+          "word": "characteristic",
+          "phonetic": "/ˌkær.ək.təˈrɪs.tɪk/",
+          "partOfSpeech": "danh từ",
+          "meaning": "đặc điểm, đặc trưng",
+          "example": "Kindness is her most defining characteristic.",
+          "exampleTranslation": "Sự tử tế là đặc điểm nổi bật nhất của cô ấy."
+        },
+        {
+          "id": "b2-39",
+          "word": "citizen",
+          "phonetic": "/ˈsɪt.ɪ.zən/",
+          "partOfSpeech": "danh từ",
+          "meaning": "công dân",
+          "example": "He applied to become an American citizen.",
+          "exampleTranslation": "Anh ấy đã nộp đơn để trở thành công dân Mỹ."
+        },
+        {
+          "id": "b2-40",
+          "word": "circumstance",
+          "phonetic": "/ˈsɜː.kəm.stɑːns/",
+          "partOfSpeech": "danh từ",
+          "meaning": "hoàn cảnh, tình huống",
+          "example": "I think she coped very well under the circumstances.",
+          "exampleTranslation": "Tôi nghĩ cô ấy đã đối phó rất tốt trong hoàn cảnh đó."
+        },
+        {
+          "id": "b2-41",
+          "word": "clarify",
+          "phonetic": "/ˈklær.ɪ.faɪ/",
+          "partOfSpeech": "động từ",
+          "meaning": "làm rõ",
+          "example": "Could you clarify the first point please?",
+          "exampleTranslation": "Bạn có thể làm rõ điểm đầu tiên được không?"
+        },
+        {
+          "id": "b2-42",
+          "word": "colleague",
+          "phonetic": "/ˈkɒl.iːɡ/",
+          "partOfSpeech": "danh từ",
+          "meaning": "đồng nghiệp",
+          "example": "I need to discuss this with my colleagues.",
+          "exampleTranslation": "Tôi cần thảo luận điều này với các đồng nghiệp của mình."
+        },
+        {
+          "id": "b2-43",
+          "word": "combine",
+          "phonetic": "/kəmˈbaɪn/",
+          "partOfSpeech": "động từ",
+          "meaning": "kết hợp",
+          "example": "You should combine regular exercise with a healthy diet.",
+          "exampleTranslation": "Bạn nên kết hợp tập thể dục thường xuyên với chế độ ăn uống lành mạnh."
+        },
+        {
+          "id": "b2-44",
+          "word": "commitment",
+          "phonetic": "/kəˈmɪt.mənt/",
+          "partOfSpeech": "danh từ",
+          "meaning": "sự cam kết",
+          "example": "Players must make a commitment to play for a full season.",
+          "exampleTranslation": "Các cầu thủ phải đưa ra cam kết thi đấu trọn vẹn một mùa giải."
+        },
+        {
+          "id": "b2-45",
+          "word": "community",
+          "phonetic": "/kəˈmjuː.nə.ti/",
+          "partOfSpeech": "danh từ",
+          "meaning": "cộng đồng",
+          "example": "He's well known in the local community.",
+          "exampleTranslation": "Anh ấy rất nổi tiếng trong cộng đồng địa phương."
+        },
+        {
+          "id": "b2-46",
+          "word": "comparison",
+          "phonetic": "/kəmˈpær.ɪ.sən/",
+          "partOfSpeech": "danh từ",
+          "meaning": "sự so sánh",
+          "example": "They made a comparison of different countries' eating habits.",
+          "exampleTranslation": "Họ đã thực hiện một phép so sánh về thói quen ăn uống của các quốc gia khác nhau."
+        },
+        {
+          "id": "b2-47",
+          "word": "complex",
+          "phonetic": "/ˈkɒm.pleks/",
+          "partOfSpeech": "tính từ",
+          "meaning": "phức tạp",
+          "example": "It's a very complex issue to which there is no simple answer.",
+          "exampleTranslation": "Đây là một vấn đề rất phức tạp mà không có câu trả lời đơn giản."
+        },
+        {
+          "id": "b2-48",
+          "word": "component",
+          "phonetic": "/kəmˈpəʊ.nənt/",
+          "partOfSpeech": "danh từ",
+          "meaning": "thành phần, linh kiện",
+          "example": "Fresh fruit is an essential component of a healthy diet.",
+          "exampleTranslation": "Trái cây tươi là một thành phần thiết yếu của một chế độ ăn uống lành mạnh."
+        },
+        {
+          "id": "b2-49",
+          "word": "concentrate",
+          "phonetic": "/ˈkɒn.sən.treɪt/",
+          "partOfSpeech": "động từ",
+          "meaning": "tập trung",
+          "example": "I can't concentrate on my work with all that noise.",
+          "exampleTranslation": "Tôi không thể tập trung vào công việc của mình với tất cả những tiếng ồn đó."
+        },
+        {
+          "id": "b2-50",
+          "word": "concept",
+          "phonetic": "/ˈkɒn.sept/",
+          "partOfSpeech": "danh từ",
+          "meaning": "khái niệm",
+          "example": "It is very difficult to define the concept of beauty.",
+          "exampleTranslation": "Rất khó để định nghĩa khái niệm về cái đẹp."
+        },
+        {
+          "id": "b2-51",
+          "word": "conclude",
+          "phonetic": "/kənˈkluːd/",
+          "partOfSpeech": "động từ",
+          "meaning": "kết luận",
+          "example": "The report concluded that the project was a failure.",
+          "exampleTranslation": "Báo cáo đã kết luận rằng dự án là một sự thất bại."
+        },
+        {
+          "id": "b2-52",
+          "word": "conduct",
+          "phonetic": "/kənˈdʌkt/",
+          "partOfSpeech": "động từ",
+          "meaning": "tiến hành, thực hiện",
+          "example": "We are conducting a survey to find out what our customers think.",
+          "exampleTranslation": "Chúng tôi đang tiến hành một cuộc khảo sát để tìm hiểu suy nghĩ của khách hàng."
+        },
+        {
+          "id": "b2-53",
+          "word": "conflict",
+          "phonetic": "/ˈkɒn.flɪkt/",
+          "partOfSpeech": "danh từ",
+          "meaning": "sự xung đột",
+          "example": "There was a lot of conflict between him and his manager.",
+          "exampleTranslation": "Có rất nhiều sự xung đột giữa anh ấy và người quản lý của mình."
+        },
+        {
+          "id": "b2-54",
+          "word": "consequence",
+          "phonetic": "/ˈkɒn.sɪ.kwəns/",
+          "partOfSpeech": "danh từ",
+          "meaning": "hậu quả, kết quả",
+          "example": "Your bad decisions can have serious consequences.",
+          "exampleTranslation": "Những quyết định tồi tệ của bạn có thể mang lại những hậu quả nghiêm trọng."
+        },
+        {
+          "id": "b2-55",
+          "word": "conservative",
+          "phonetic": "/kənˈsɜː.və.tɪv/",
+          "partOfSpeech": "tính từ",
+          "meaning": "bảo thủ, thận trọng",
+          "example": "Older people tend to be more conservative about new technology.",
+          "exampleTranslation": "Người lớn tuổi có xu hướng bảo thủ hơn về công nghệ mới."
+        },
+        {
+          "id": "b2-56",
+          "word": "consistent",
+          "phonetic": "/kənˈsɪs.tənt/",
+          "partOfSpeech": "tính từ",
+          "meaning": "kiên định, nhất quán",
+          "example": "There has been a consistent improvement in her grades.",
+          "exampleTranslation": "Đã có một sự cải thiện nhất quán trong điểm số của cô ấy."
+        },
+        {
+          "id": "b2-57",
+          "word": "constant",
+          "phonetic": "/ˈkɒn.stənt/",
+          "partOfSpeech": "tính từ",
+          "meaning": "liên tục, không đổi",
+          "example": "He's in constant trouble with the police.",
+          "exampleTranslation": "Anh ta liên tục gặp rắc rối với cảnh sát."
+        },
+        {
+          "id": "b2-58",
+          "word": "construct",
+          "phonetic": "/kənˈstrʌkt/",
+          "partOfSpeech": "động từ",
+          "meaning": "xây dựng",
+          "example": "The new bridge will be constructed of steel and concrete.",
+          "exampleTranslation": "Cây cầu mới sẽ được xây dựng bằng thép và bê tông."
+        },
+        {
+          "id": "b2-59",
+          "word": "consume",
+          "phonetic": "/kənˈsjuːm/",
+          "partOfSpeech": "động từ",
+          "meaning": "tiêu thụ",
+          "example": "Our cars consume a large amount of fuel every year.",
+          "exampleTranslation": "Ô tô của chúng ta tiêu thụ một lượng lớn nhiên liệu mỗi năm."
+        },
+        {
+          "id": "b2-60",
+          "word": "contemporary",
+          "phonetic": "/kənˈtem.pər.ər.i/",
+          "partOfSpeech": "tính từ",
+          "meaning": "đương đại",
+          "example": "She is interested in contemporary art and music.",
+          "exampleTranslation": "Cô ấy quan tâm đến nghệ thuật và âm nhạc đương đại."
+        }
+      ]
+    },
+    {
+      "id": "c1",
+      "label": "C1 · Cao cấp",
+      "description": "Ngôn ngữ học thuật, sắc thái tinh tế",
+      "color": "#C24B41",
+      "pointMultiplier": 2.5,
+      "words": [
+        { "id": "c1-01", "word": "unprecedented", "phonetic": "/ʌnˈpres.ɪ.den.tɪd/", "partOfSpeech": "tính từ", "meaning": "chưa từng có tiền lệ", "example": "The city faced an unprecedented flood this year.", "exampleTranslation": "Thành phố phải đối mặt với trận lũ chưa từng có tiền lệ năm nay." },
+        { "id": "c1-02", "word": "meticulous",    "phonetic": "/məˈtɪk.jə.ləs/",     "partOfSpeech": "tính từ", "meaning": "tỉ mỉ, cẩn thận",       "example": "She is meticulous about every small detail.",       "exampleTranslation": "Cô ấy rất tỉ mỉ với từng chi tiết nhỏ." },
+        { "id": "c1-03", "word": "ambiguous",     "phonetic": "/æmˈbɪɡ.ju.əs/",      "partOfSpeech": "tính từ", "meaning": "mơ hồ, không rõ ràng",  "example": "His answer was deliberately ambiguous.",            "exampleTranslation": "Câu trả lời của anh ấy cố tình mơ hồ." },
+        { "id": "c1-04", "word": "exacerbate",    "phonetic": "/ɪɡˈzæs.ə.beɪt/",     "partOfSpeech": "động từ", "meaning": "làm trầm trọng thêm",   "example": "Poor sleep can exacerbate stress levels.",          "exampleTranslation": "Giấc ngủ kém có thể làm trầm trọng thêm mức độ căng thẳng." },
+        { "id": "c1-05", "word": "juxtaposition", "phonetic": "/ˌdʒʌk.stə.pəˈzɪʃ.ən/","partOfSpeech": "danh từ", "meaning": "sự đặt cạnh nhau để so sánh", "example": "The film uses juxtaposition of past and present.", "exampleTranslation": "Bộ phim sử dụng thủ pháp đặt cạnh nhau giữa quá khứ và hiện tại." },
+        { "id": "c1-06", "word": "procrastinate", "phonetic": "/prəˈkræs.tɪ.neɪt/",  "partOfSpeech": "động từ", "meaning": "trì hoãn",             "example": "Stop procrastinating and start studying.",          "exampleTranslation": "Đừng trì hoãn nữa và bắt đầu học đi." },
+        { "id": "c1-07", "word": "ubiquitous",    "phonetic": "/juːˈbɪk.wɪ.təs/",    "partOfSpeech": "tính từ", "meaning": "có mặt khắp nơi",       "example": "Smartphones have become ubiquitous today.",         "exampleTranslation": "Điện thoại thông minh ngày nay có mặt ở khắp mọi nơi." },
+        { "id": "c1-08", "word": "resilience",    "phonetic": "/rɪˈzɪl.i.əns/",      "partOfSpeech": "danh từ", "meaning": "khả năng phục hồi",     "example": "The team showed great resilience after the loss.", "exampleTranslation": "Đội đã thể hiện khả năng phục hồi tuyệt vời sau thất bại." },
+        { "id": "c1-09", "word": "pragmatic",     "phonetic": "/præɡˈmæt.ɪk/",       "partOfSpeech": "tính từ", "meaning": "thực dụng, thực tế",    "example": "We need a pragmatic solution to this problem.",    "exampleTranslation": "Chúng ta cần một giải pháp thực tế cho vấn đề này." },
+        { "id": "c1-10", "word": "eloquent",      "phonetic": "/ˈel.ə.kwənt/",       "partOfSpeech": "tính từ", "meaning": "hùng biện, lưu loát",   "example": "She gave an eloquent speech at the ceremony.",      "exampleTranslation": "Cô ấy đã có một bài phát biểu hùng biện tại buổi lễ." }
+      ]
+    }
+  ]
+}
