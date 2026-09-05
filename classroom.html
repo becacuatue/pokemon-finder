@@ -6,6 +6,7 @@
     <title>Lớp học của tôi · DTEdu</title>
     <link rel="stylesheet" href="classroom.css">
     <link rel="stylesheet" href="vocab.css">
+    <link rel="stylesheet" href="profile.css">
 </head>
 <body>
 
@@ -118,11 +119,80 @@
     <!-- ================= PHẦN 2: DANH SÁCH BÀI TẬP (Dashboard) ================= -->
     <section id="dashboard-section" class="container panel-card hidden">
         <button class="btn-back" onclick="goBackToClasses()">&#8592; Quay lại chọn lớp</button>
+
+        <!-- ================= [THÊM MỚI] THÔNG TIN GIÁO VIÊN PHỤ TRÁCH LỚP =================
+             Dữ liệu đọc từ classes/{id}: teacherName, teacherTitle, teacherPhotoUrl, teacherBio.
+             Các field này chưa có trong admin.js — cứ để đây, khi nào đồng bộ dữ liệu giáo viên
+             ở admin thì giao diện này sẽ tự động hiển thị đúng thông tin, không cần sửa code. -->
+        <div class="teacher-info-card" id="class-teacher-card">
+            <div class="teacher-avatar-wrap">
+                <img id="class-teacher-photo" class="teacher-avatar hidden" src="" alt="Ảnh giáo viên">
+                <div id="class-teacher-avatar-fallback" class="teacher-avatar">👩‍🏫</div>
+            </div>
+            <div class="teacher-info-body">
+                <p class="welcome-eyebrow">Giáo viên phụ trách</p>
+                <h3 id="class-teacher-name">Đang cập nhật...</h3>
+                <p class="teacher-title" id="class-teacher-title"></p>
+                <p class="teacher-bio" id="class-teacher-bio">Thông tin giáo viên sẽ được cập nhật sớm.</p>
+            </div>
+        </div>
+
         <div class="section-heading">
             <h2 id="current-class-title">Bài tập: --</h2>
         </div>
         <p class="section-sub">Chọn một bài tập bên dưới để bắt đầu làm bài.</p>
-        <div id="lesson-grid" class="grid"></div>
+        <!-- [THÊM MỚI] Không còn class "grid" trực tiếp ở đây — classroom.js sẽ nhóm các
+             bài tập theo NGÀY tạo (createdAt) và tự chèn từng khối .day-group > .grid bên trong. -->
+        <div id="lesson-grid"></div>
+    </section>
+
+    <!-- ================= [THÊM MỚI] KHỞI ĐỘNG TỪ VỰNG TRƯỚC KHI LÀM BÀI =================
+         Tái sử dụng NGUYÊN VẸN css & cơ chế của module luyện từ vựng độc lập (vocab.css):
+         từ tiếng Anh + tự đọc phát âm (Web Speech API) + chọn 1/4 đáp án nghĩa.
+         Chỉ hiện ra khi bài tập (exercises/{id}) có field "vocabWarmup" — 1 mảng từ
+         vựng dạng { word, phonetic, partOfSpeech, meaning, example, exampleTranslation }
+         (giống hệt cấu trúc trong vocab-data.json). Bài nào CHƯA có field này (mặc định
+         với toàn bộ bài hiện tại) sẽ bỏ qua bước này và vào thẳng bài làm như trước —
+         tính năng này CHỜ BẠN ĐỒNG BỘ DỮ LIỆU SAU, không cần sửa code gì thêm khi đó. -->
+    <section id="lesson-vocab-warmup-section" class="container panel-card hidden" style="max-width:900px;">
+        <button class="btn-back" type="button" id="btn-skip-vocab-warmup">&#8592; Bỏ qua, vào làm bài luôn</button>
+
+        <div class="vocab-practice-header">
+            <span class="vocab-level-badge">🔤 Khởi động từ vựng</span>
+            <div class="vocab-live-stats">
+                <div class="vocab-live-stat">
+                    <span class="stat-label">Tiến độ</span>
+                    <strong id="lesson-vocab-progress">0/0</strong>
+                </div>
+            </div>
+        </div>
+        <p class="section-sub" id="lesson-vocab-exercise-title" style="margin-top:-8px;">Ôn nhanh từ vựng trước khi vào bài.</p>
+
+        <div class="vocab-card" id="lesson-vocab-card">
+            <div class="vocab-word-row">
+                <h2 class="vocab-word-display" id="lesson-vocab-word">--</h2>
+                <button type="button" class="vocab-speak-btn" id="lesson-vocab-speak-btn" title="Nghe phát âm">🔊</button>
+            </div>
+            <p class="vocab-phonetic" id="lesson-vocab-phonetic"></p>
+
+            <div class="vocab-options" id="lesson-vocab-options"></div>
+
+            <div class="vocab-feedback hidden" id="lesson-vocab-feedback">
+                <p class="vocab-feedback-text" id="lesson-vocab-feedback-text"></p>
+                <p class="vocab-example" id="lesson-vocab-example"></p>
+            </div>
+
+            <button type="button" class="btn btn-primary vocab-next-btn hidden" id="lesson-vocab-next-btn">Từ tiếp theo →</button>
+        </div>
+
+        <div class="vocab-complete hidden" id="lesson-vocab-complete">
+            <div class="vocab-complete-icon">🎉</div>
+            <h3>Đã khởi động xong từ vựng!</h3>
+            <p>Giờ thì vào làm bài tập chính thức thôi.</p>
+            <div class="vocab-complete-actions">
+                <button type="button" class="btn btn-primary" id="btn-continue-to-test">Vào làm bài →</button>
+            </div>
+        </div>
     </section>
 
     <!-- ================= PHẦN 3: LÀM BÀI TẬP (Split View) ================= -->
@@ -198,9 +268,40 @@
                 </div>
             </div>
 
+            <!-- ================= [THÊM MỚI] HỒ SƠ CHI TIẾT — PORT TỪ TRANG ADMIN =================
+                 Thông tin cá nhân + điểm số tổng hợp + xếp hạng + nhật ký buổi học do giáo
+                 viên đánh giá (giống hệt "Hồ sơ chi tiết học viên" bên admin.js / profile.js),
+                 giờ hiển thị luôn ngay trong trang lớp học để học viên không cần qua trang
+                 Hồ sơ riêng mới xem được. Chỉ hiện khi đã đăng nhập. -->
+            <div id="stats-profile-detail" class="hidden">
+                <div class="profile-rank-badge" id="stats-rank-badge" style="margin-bottom:16px;">Đang tính hạng...</div>
+
+                <div class="profile-grid">
+                    <div class="profile-info-card">
+                        <h3>👤 Thông tin cá nhân</h3>
+                        <dl class="info-list" id="stats-info-list"></dl>
+                    </div>
+                    <div class="profile-score-card">
+                        <h3>📊 Điểm tổng hợp</h3>
+                        <div class="score-bars" id="stats-score-bars"></div>
+                        <div class="composite-score-box">
+                            <span>Điểm tổng hợp (xếp hạng)</span>
+                            <strong id="stats-composite-score">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sessions-section">
+                    <div class="section-heading">
+                        <h3>🗓 Nhận xét của giáo viên qua từng buổi học</h3>
+                    </div>
+                    <div id="stats-sessions-list" class="sessions-list"></div>
+                </div>
+            </div>
+
             <!-- Lịch sử chi tiết các bài đã làm -->
             <div class="history-panel">
-                <h3>🕒 Lịch sử nộp bài chi tiết</h3>
+                <h3>🕒 Lịch sử nộp bài chi tiết (nhóm theo ngày, bấm vào để xem chi tiết từng câu)</h3>
                 <div id="history-list" class="detailed-results-container">
                     <!-- Render từ JavaScript -->
                 </div>

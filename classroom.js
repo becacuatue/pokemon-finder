@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, query, where, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
  
 const firebaseConfig = {
     apiKey: "AIzaSyCCfo_YmY770dFXA13Z7RS-xk1Satm-FEY",
@@ -38,6 +38,57 @@ function computeCompositeScore(scores = {}) {
 // [THÊM MỚI] Escape HTML để chèn dữ liệu (tên lớp, tiêu đề bài...) an toàn hơn
 function escapeHtml(str = '') {
     return String(str).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+// ============================================================
+// [THÊM MỚI] "HỒ SƠ CHI TIẾT" PORT TỪ ADMIN.JS / PROFILE.JS
+// Dùng để hiển thị ngay trong trang "Kết quả học tập" của lớp học,
+// không phải sửa đổi công thức điểm hay logic — chỉ đọc & hiển thị.
+// ============================================================
+const STATS_INFO_FIELDS = [
+    { key: 'dob', label: 'Ngày sinh', type: 'date' },
+    { key: 'gender', label: 'Giới tính' },
+    { key: 'phone', label: 'Số điện thoại' },
+    { key: 'parentPhone', label: 'SĐT phụ huynh' },
+    { key: 'address', label: 'Địa chỉ' },
+    { key: 'email', label: 'Email' },
+    { key: 'notes', label: 'Ghi chú từ giáo viên' },
+];
+const BONUS_BAR_MAX = 30;
+const PARTICIPATION_BAR_MAX = 30;
+
+function formatDateVN(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    return d.toLocaleDateString('vi-VN');
+}
+function round1(n) { return Math.round((n || 0) * 10) / 10; }
+function clampPct(value, max) { if (!max) return 0; return Math.max(0, Math.min(100, ((value || 0) / max) * 100)); }
+
+// [THÊM MỚI] Nhóm 1 danh sách theo NGÀY (dùng chung cho: bài tập trong lớp,
+// lịch sử làm bài kiểm tra, nhật ký buổi học) — sắp xếp ngày gần nhất lên đầu,
+// ví dụ: 23/08, 22/08, 21/08... Mục nào thiếu ngày hợp lệ sẽ gom vào cuối cùng.
+function groupByDay(items, dateGetter) {
+    const buckets = new Map();
+    items.forEach((item) => {
+        const d = dateGetter(item);
+        let key, label;
+        if (d && !isNaN(d)) {
+            key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            label = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+        } else {
+            key = 'unknown';
+            label = 'Chưa rõ ngày';
+        }
+        if (!buckets.has(key)) buckets.set(key, { key, label, items: [] });
+        buckets.get(key).items.push(item);
+    });
+    return [...buckets.values()].sort((a, b) => {
+        if (a.key === 'unknown') return 1;
+        if (b.key === 'unknown') return -1;
+        return b.key.localeCompare(a.key);
+    });
 }
  
 // ============================================================
@@ -298,8 +349,10 @@ window.goBackToClasses = function() {
  
 window.goBackToDashboard = function() {
     stopCountdown(); // [THÊM MỚI] dừng đếm ngược nếu thoát làm bài giữa chừng
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // [THÊM MỚI] dừng đọc từ vựng nếu còn đang phát
     document.getElementById('test-section').classList.add('hidden');
     document.getElementById('result-section').classList.add('hidden');
+    document.getElementById('lesson-vocab-warmup-section')?.classList.add('hidden'); // [THÊM MỚI]
     document.getElementById('dashboard-section').classList.remove('hidden');
 }
  
@@ -309,6 +362,8 @@ window.loadExercisesForClass = async function(classId, className) {
     document.getElementById('current-class-title').textContent = `Bài tập: ${className}`;
  
     rememberCurrentClass(className); // [THÊM MỚI] ghi nhớ + hiển thị khóa học đang chọn
+
+    loadClassTeacherCard(classId); // [THÊM MỚI] thông tin giáo viên phụ trách lớp (không chặn tải bài tập)
  
     const grid = document.getElementById('lesson-grid');
     grid.innerHTML = '<p>Đang tải dữ liệu bài tập...</p>';
@@ -335,32 +390,92 @@ window.loadExercisesForClass = async function(classId, className) {
             return;
         }
 
-        grid.innerHTML = ''; 
-        availableExercises.forEach(test => {
-            const card = document.createElement('div');
-            const isDone = completedExerciseIds.has(test.id); // [THÊM MỚI]
-            card.className = 'card' + (isDone ? ' already-done' : '');
-            const audioBadge = test.audioUrl ? `<span class="meta-chip meta-chip-audio">🎧 Có bài nghe</span>` : '';
-            const doneBadge = isDone ? `<span class="done-badge">✓ Đã hoàn thành</span>` : ''; // [THÊM MỚI]
-            card.innerHTML = `
-                ${doneBadge}
-                <h3>${escapeHtml(test.title || '')}</h3>
-                <p class="card-description">${escapeHtml(test.description || 'Không có mô tả')}</p>
-                <div class="lesson-meta">
-                    <span class="meta-chip">📝 ${test.questions ? test.questions.length : 0} câu</span>
-                    <span class="meta-chip">⏱ ${test.timeLimit} phút</span>
-                    ${audioBadge}
-                </div>
-                <button class="btn-primary" id="btn-start-${test.id}">${isDone ? 'Làm lại bài này' : 'Bắt đầu làm bài'}</button>
-            `;
-            grid.appendChild(card);
-            
-            // Gắn sự kiện click
-            document.getElementById(`btn-start-${test.id}`).addEventListener('click', () => startTest(test.id));
+        // [THÊM MỚI] Nhóm bài tập theo NGÀY tạo (createdAt), ví dụ: ngày 23, 22, 21...
+        // Bài chưa có createdAt sẽ gom vào nhóm "Chưa rõ ngày" ở cuối cùng.
+        grid.innerHTML = '';
+        const dayGroups = groupByDay(availableExercises, (t) => (t.createdAt?.toDate ? t.createdAt.toDate() : null));
+
+        dayGroups.forEach((group) => {
+            const groupWrap = document.createElement('div');
+            groupWrap.className = 'day-group';
+            groupWrap.innerHTML = `<h4 class="day-group-header">📅 Ngày ${escapeHtml(group.label)}</h4>`;
+
+            const subGrid = document.createElement('div');
+            subGrid.className = 'grid day-group-grid';
+
+            group.items.forEach((test) => {
+                const card = document.createElement('div');
+                const isDone = completedExerciseIds.has(test.id); // [THÊM MỚI]
+                card.className = 'card' + (isDone ? ' already-done' : '');
+                const audioBadge = test.audioUrl ? `<span class="meta-chip meta-chip-audio">🎧 Có bài nghe</span>` : '';
+                const doneBadge = isDone ? `<span class="done-badge">✓ Đã hoàn thành</span>` : ''; // [THÊM MỚI]
+                const vocabBadge = (test.vocabWarmup && test.vocabWarmup.length) ? `<span class="meta-chip">🔤 Khởi động từ vựng</span>` : ''; // [THÊM MỚI]
+                card.innerHTML = `
+                    ${doneBadge}
+                    <h3>${escapeHtml(test.title || '')}</h3>
+                    <p class="card-description">${escapeHtml(test.description || 'Không có mô tả')}</p>
+                    <div class="lesson-meta">
+                        <span class="meta-chip">📝 ${test.questions ? test.questions.length : 0} câu</span>
+                        <span class="meta-chip">⏱ ${test.timeLimit} phút</span>
+                        ${audioBadge}
+                        ${vocabBadge}
+                    </div>
+                    <button class="btn-primary" id="btn-start-${test.id}">${isDone ? 'Làm lại bài này' : 'Bắt đầu làm bài'}</button>
+                `;
+                subGrid.appendChild(card);
+
+                // Gắn sự kiện click
+                card.querySelector(`#btn-start-${test.id}`).addEventListener('click', () => startTest(test.id));
+            });
+
+            groupWrap.appendChild(subGrid);
+            grid.appendChild(groupWrap);
         });
     } catch (error) {
         console.error("Lỗi khi tải bài tập:", error);
         grid.innerHTML = '<p>Lỗi tải dữ liệu. Vui lòng F5 lại trang.</p>';
+    }
+}
+
+// [THÊM MỚI] Thẻ thông tin giáo viên phụ trách lớp — đọc từ classes/{id}:
+// teacherName, teacherTitle, teacherPhotoUrl, teacherBio. Các field này CHƯA
+// được quản lý trong admin.js — cứ để giao diện sẵn đây, khi nào bổ sung field
+// đó vào admin (CLASS_FIELDS) và điền dữ liệu thì thẻ sẽ tự hiển thị đúng,
+// không cần sửa gì thêm ở đây.
+async function loadClassTeacherCard(classId) {
+    const nameEl = document.getElementById('class-teacher-name');
+    const titleEl = document.getElementById('class-teacher-title');
+    const bioEl = document.getElementById('class-teacher-bio');
+    const photoEl = document.getElementById('class-teacher-photo');
+    const fallbackEl = document.getElementById('class-teacher-avatar-fallback');
+    if (!nameEl) return;
+
+    // Trạng thái mặc định trong lúc tải / khi chưa có dữ liệu
+    nameEl.textContent = 'Đang cập nhật...';
+    titleEl.textContent = '';
+    bioEl.textContent = 'Thông tin giáo viên sẽ được cập nhật sớm.';
+    photoEl.classList.add('hidden');
+    fallbackEl.classList.remove('hidden');
+    fallbackEl.textContent = '👩‍🏫';
+
+    try {
+        const classSnap = await getDoc(doc(db, 'classes', classId));
+        if (!classSnap.exists()) return;
+        const c = classSnap.data();
+
+        nameEl.textContent = c.teacherName || 'Đang cập nhật...';
+        titleEl.textContent = c.teacherTitle || '';
+        bioEl.textContent = c.teacherBio || 'Thông tin giáo viên sẽ được cập nhật sớm.';
+
+        if (c.teacherPhotoUrl) {
+            photoEl.src = c.teacherPhotoUrl;
+            photoEl.classList.remove('hidden');
+            fallbackEl.classList.add('hidden');
+        } else {
+            fallbackEl.textContent = getInitials(c.teacherName) === '?' ? '👩‍🏫' : getInitials(c.teacherName);
+        }
+    } catch (error) {
+        console.error('Lỗi khi tải thông tin giáo viên:', error);
     }
 }
  
@@ -403,8 +518,19 @@ function startCountdown(minutes) {
 }
 
 // Bắt đầu làm bài
+// [THÊM MỚI] Trước khi vào bài thật, kiểm tra xem bài này có mảng "vocabWarmup"
+// không — nếu có thì cho học viên khởi động từ vựng trước (xem maybeStartVocabWarmup).
 function startTest(testId) {
-    currentTestSession = availableExercises.find(t => t.id === testId);
+    const test = availableExercises.find(t => t.id === testId);
+    if (!test) return;
+    currentTestSession = test;
+
+    if (maybeStartVocabWarmup(test)) return; // có từ vựng khởi động -> dừng ở đây, vào bài thật sau khi xong/bỏ qua
+    proceedToRealTest(testId);
+}
+
+function proceedToRealTest(testId) {
+    currentTestSession = availableExercises.find(t => t.id === testId) || currentTestSession;
     
     document.getElementById('dashboard-section').classList.add('hidden');
     document.getElementById('result-section').classList.add('hidden');
@@ -475,7 +601,169 @@ function startTest(testId) {
         qContainer.appendChild(block);
     });
 }
- 
+
+// ============================================================
+// [THÊM MỚI] KHỞI ĐỘNG TỪ VỰNG TRƯỚC KHI LÀM BÀI
+// Tái sử dụng NGUYÊN VẸN css & cơ chế của module luyện từ vựng độc lập
+// (xem vocab.css / vocab.js): 1 từ tiếng Anh + tự đọc phát âm bằng Web
+// Speech API + chọn 1 trong 4 đáp án nghĩa tiếng Việt.
+//
+// CƠ CHẾ "CHỜ ĐỒNG BỘ SAU": bài tập nào có field `vocabWarmup` (mảng object
+// dạng { word, phonetic, partOfSpeech, meaning, example, exampleTranslation }
+// — ĐÚNG cấu trúc như trong vocab-data.json) sẽ tự động hiện bước khởi động
+// từ vựng này trước khi vào bài. Bài KHÔNG có field này (mặc định với toàn
+// bộ dữ liệu hiện tại) sẽ bỏ qua và vào thẳng bài làm như trước — không cần
+// sửa code gì thêm khi bạn đồng bộ/nhập dữ liệu vocabWarmup sau này.
+// ============================================================
+let lessonVocabQueue = [];
+let lessonVocabWord = null;
+let lessonVocabTotal = 0;
+let lessonVocabDone = 0;
+let pendingTestIdAfterWarmup = null;
+
+function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// Trả về true nếu đã chuyển sang màn khởi động từ vựng (gọi nơi khác nên dừng lại).
+function maybeStartVocabWarmup(test) {
+    const words = Array.isArray(test.vocabWarmup) ? test.vocabWarmup.filter(w => w && w.word && w.meaning) : [];
+    if (words.length === 0) return false;
+
+    stopCountdown(); // đề phòng còn bộ đếm giờ cũ từ lượt làm bài trước đó
+
+    pendingTestIdAfterWarmup = test.id;
+    lessonVocabQueue = shuffleArray(words);
+    lessonVocabTotal = lessonVocabQueue.length;
+    lessonVocabDone = 0;
+
+    document.getElementById('dashboard-section').classList.add('hidden');
+    document.getElementById('result-section').classList.add('hidden');
+    document.getElementById('test-section').classList.add('hidden');
+    document.getElementById('lesson-vocab-warmup-section').classList.remove('hidden');
+    document.getElementById('lesson-vocab-exercise-title').textContent = `Ôn nhanh từ vựng trước khi vào bài: ${test.title || ''}`;
+    document.getElementById('lesson-vocab-card').classList.remove('hidden');
+    document.getElementById('lesson-vocab-complete').classList.add('hidden');
+    updateLessonVocabProgress();
+    nextLessonVocabWord();
+    window.scrollTo(0, 0);
+    return true;
+}
+
+function updateLessonVocabProgress() {
+    const el = document.getElementById('lesson-vocab-progress');
+    if (el) el.textContent = `${lessonVocabDone}/${lessonVocabTotal}`;
+}
+
+function nextLessonVocabWord() {
+    if (lessonVocabQueue.length === 0) {
+        document.getElementById('lesson-vocab-card').classList.add('hidden');
+        document.getElementById('lesson-vocab-complete').classList.remove('hidden');
+        return;
+    }
+    lessonVocabWord = lessonVocabQueue.shift();
+    document.getElementById('lesson-vocab-word').textContent = lessonVocabWord.word;
+    document.getElementById('lesson-vocab-phonetic').innerHTML =
+        `${escapeHtml(lessonVocabWord.phonetic || '')} <span class="vocab-pos">${escapeHtml(lessonVocabWord.partOfSpeech || '')}</span>`;
+
+    const feedback = document.getElementById('lesson-vocab-feedback');
+    feedback.classList.add('hidden');
+    feedback.classList.remove('is-correct', 'is-wrong');
+    document.getElementById('lesson-vocab-next-btn').classList.add('hidden');
+
+    renderLessonVocabOptions();
+    speakLessonVocabWord(lessonVocabWord.word);
+}
+
+function speakLessonVocabWord(text) {
+    if (!('speechSynthesis' in window)) return;
+    try {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        msg.rate = 0.92;
+        window.speechSynthesis.speak(msg);
+    } catch (e) {
+        console.error('Lỗi phát âm (Web Speech API):', e);
+    }
+}
+
+function renderLessonVocabOptions() {
+    const container = document.getElementById('lesson-vocab-options');
+    container.innerHTML = '';
+
+    // Nghĩa nhiễu: lấy trong chính danh sách vocabWarmup của bài này.
+    let pool = [...lessonVocabQueue, lessonVocabWord].filter(w => w.meaning !== lessonVocabWord.meaning);
+    pool = shuffleArray(pool);
+    const distractors = [];
+    for (const w of pool) {
+        if (distractors.length >= 3) break;
+        if (!distractors.includes(w.meaning)) distractors.push(w.meaning);
+    }
+    // Nếu bài quá ít từ để đủ 3 nghĩa nhiễu khác nhau, độn thêm nghĩa trung tính cố định.
+    const fallbackMeanings = ['một khái niệm khác', 'một hành động khác', 'một tính chất khác'];
+    let fi = 0;
+    while (distractors.length < 3) { distractors.push(fallbackMeanings[fi % fallbackMeanings.length]); fi++; }
+
+    const options = shuffleArray([lessonVocabWord.meaning, ...distractors]);
+    const letters = ['A', 'B', 'C', 'D'];
+    options.forEach((meaning, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'vocab-option-btn';
+        btn.innerHTML = `<span class="opt-letter">${letters[idx]}</span><span>${escapeHtml(meaning)}</span>`;
+        btn.addEventListener('click', () => selectLessonVocabAnswer(meaning, btn));
+        container.appendChild(btn);
+    });
+}
+
+function selectLessonVocabAnswer(chosenMeaning, btnEl) {
+    const buttons = document.getElementById('lesson-vocab-options').querySelectorAll('.vocab-option-btn');
+    if (buttons.length && buttons[0].disabled) return; // đã trả lời từ này rồi
+    const isCorrect = chosenMeaning === lessonVocabWord.meaning;
+
+    buttons.forEach((btn) => {
+        btn.disabled = true;
+        const meaningText = btn.querySelector('span:last-child').textContent;
+        if (meaningText === lessonVocabWord.meaning) btn.classList.add('correct');
+        else if (btn === btnEl && !isCorrect) btn.classList.add('wrong');
+        else btn.classList.add('dim');
+    });
+
+    const feedback = document.getElementById('lesson-vocab-feedback');
+    feedback.classList.remove('hidden');
+    feedback.classList.toggle('is-correct', isCorrect);
+    feedback.classList.toggle('is-wrong', !isCorrect);
+    document.getElementById('lesson-vocab-feedback-text').innerHTML = isCorrect
+        ? `✅ Chính xác! "${escapeHtml(lessonVocabWord.word)}" = ${escapeHtml(lessonVocabWord.meaning)}`
+        : `❌ Chưa đúng. "${escapeHtml(lessonVocabWord.word)}" nghĩa là <strong>${escapeHtml(lessonVocabWord.meaning)}</strong>`;
+    document.getElementById('lesson-vocab-example').textContent = lessonVocabWord.example
+        ? `💬 ${lessonVocabWord.example}${lessonVocabWord.exampleTranslation ? ' — ' + lessonVocabWord.exampleTranslation : ''}`
+        : '';
+
+    lessonVocabDone++;
+    updateLessonVocabProgress();
+    document.getElementById('lesson-vocab-next-btn').classList.remove('hidden');
+}
+
+document.getElementById('lesson-vocab-next-btn')?.addEventListener('click', nextLessonVocabWord);
+document.getElementById('lesson-vocab-speak-btn')?.addEventListener('click', () => {
+    if (lessonVocabWord) speakLessonVocabWord(lessonVocabWord.word);
+});
+document.getElementById('btn-skip-vocab-warmup')?.addEventListener('click', () => {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    document.getElementById('lesson-vocab-warmup-section').classList.add('hidden');
+    proceedToRealTest(pendingTestIdAfterWarmup);
+});
+document.getElementById('btn-continue-to-test')?.addEventListener('click', () => {
+    document.getElementById('lesson-vocab-warmup-section').classList.add('hidden');
+    proceedToRealTest(pendingTestIdAfterWarmup);
+});
 // Chấm điểm và Lưu
 // [THÊM MỚI] Chống nộp bài trùng lặp (hết giờ tự nộp đúng lúc học viên bấm nộp tay)
 let isSubmittingTest = false;
@@ -569,11 +857,15 @@ window.showLearningStats = async function() {
     document.getElementById('dashboard-section').classList.add('hidden');
     document.getElementById('test-section').classList.add('hidden');
     document.getElementById('result-section').classList.add('hidden');
+    document.getElementById('lesson-vocab-warmup-section')?.classList.add('hidden');
     document.getElementById('learning-stats-section').classList.remove('hidden');
+    window.scrollTo(0, 0);
  
     const userIdToQuery = CURRENT_USER_ID || "guest_test_user";
     const historyList = document.getElementById('history-list');
     historyList.innerHTML = '<p style="text-align: center; color: #666;">Đang đồng bộ dữ liệu học tập từ hệ thống...</p>';
+
+    loadStatsProfileDetail(userIdToQuery); // [THÊM MỚI] hồ sơ chi tiết (port từ admin/profile) — chạy song song, không chặn phần dưới
  
     try {
         // Truy vấn tất cả kết quả của user này trong bảng results
@@ -583,7 +875,6 @@ window.showLearningStats = async function() {
         let totalTests = 0;
         let totalScoreSum = 0;
         let totalCorrect = 0;
-        let historyHtml = '';
  
         if (querySnapshot.empty) {
             historyList.innerHTML = '<p style="text-align: center; color: #666;">Bạn chưa hoàn thành bài tập nào trên hệ thống.</p>';
@@ -592,36 +883,39 @@ window.showLearningStats = async function() {
             document.getElementById('total-correct').textContent = '0';
             return;
         }
- 
-        querySnapshot.forEach((docSnap) => {
-            const data = docSnap.data();
+
+        const resultsRaw = [];
+        querySnapshot.forEach((docSnap) => resultsRaw.push({ id: docSnap.id, ...docSnap.data() }));
+
+        resultsRaw.forEach((data) => {
             totalTests++;
             totalScoreSum += (data.scorePercentage || 0);
             totalCorrect += (data.correctAnswers || 0);
- 
-            // Format ngày tháng từ Firebase Timestamp
-            let dateStr = 'Gần đây';
-            if (data.timestamp && typeof data.timestamp.toDate === 'function') {
-                dateStr = data.timestamp.toDate().toLocaleString('vi-VN');
-            }
- 
-            // Màu sắc điểm số tùy thuộc vào %
-            const scoreColorClass = data.scorePercentage >= 50 ? 'text-green' : 'text-red';
- 
-            historyHtml += `
-                <div class="result-item" style="background: #fafafa; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 12px;">
-                    <div>
-                        <h4 style="color: var(--text-dark); margin-bottom: 5px;">Mã bài tập: <span style="font-family: monospace; color: #555;">${data.exerciseId}</span></h4>
-                        <p style="font-size: 13px; color: #666;">⏱ Thời gian nộp: ${dateStr}</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 20px; font-weight: 700;" class="${scoreColorClass}">
-                            ${data.scorePercentage}%
-                        </div>
-                        <p style="font-size: 13px; color: #666;">Đúng: ${data.correctAnswers} | Sai: ${data.mistakes}</p>
-                    </div>
-                </div>
-            `;
+        });
+
+        // [THÊM MỚI] Tra cứu tiêu đề + dữ liệu câu hỏi của từng bài tập (để hiển thị tên
+        // thật thay vì mã bài, và để có thể xem lại chi tiết từng câu khi bấm vào).
+        const uniqueExerciseIds = [...new Set(resultsRaw.map((r) => r.exerciseId).filter(Boolean))];
+        const exerciseMap = {};
+        await Promise.all(uniqueExerciseIds.map(async (exId) => {
+            try {
+                const exSnap = await getDoc(doc(db, 'exercises', exId));
+                if (exSnap.exists()) exerciseMap[exId] = { id: exSnap.id, ...exSnap.data() };
+            } catch (e) { /* bài có thể đã bị xóa khỏi hệ thống — bỏ qua */ }
+        }));
+
+        // [THÊM MỚI] Nhóm lịch sử làm bài theo NGÀY nộp bài (ví dụ: ngày 23, 22, 21...)
+        const dayGroups = groupByDay(resultsRaw, (r) => (r.timestamp?.toDate ? r.timestamp.toDate() : null));
+        historyList.innerHTML = dayGroups.map((group) => `
+            <div class="day-group">
+                <h4 class="day-group-header">📅 Ngày ${escapeHtml(group.label)}</h4>
+                ${group.items.map((r) => renderQuizHistoryItemHtml(r, exerciseMap[r.exerciseId])).join('')}
+            </div>
+        `).join('');
+
+        // Bấm vào 1 lượt làm bài để mở/đóng xem chi tiết từng câu
+        historyList.querySelectorAll('.quiz-history-summary').forEach((btn) => {
+            btn.addEventListener('click', () => btn.closest('.quiz-history-item').classList.toggle('is-open'));
         });
  
         // Tính điểm trung bình
@@ -631,12 +925,188 @@ window.showLearningStats = async function() {
         document.getElementById('total-tests').textContent = totalTests;
         document.getElementById('avg-score').textContent = avgScore + '%';
         document.getElementById('total-correct').textContent = totalCorrect;
-        historyList.innerHTML = historyHtml;
  
     } catch (error) {
         console.error("Lỗi khi tải thống kê học tập:", error);
         historyList.innerHTML = '<p style="color: red; text-align: center;">Không thể tải dữ liệu thống kê. Vui lòng kiểm tra lại kết nối.</p>';
     }
+}
+
+// [THÊM MỚI] Render 1 lượt làm bài trong lịch sử — dạng có thể bấm mở rộng để
+// xem lại chi tiết TỪNG CÂU (đúng/sai, đáp án đúng, giải thích) — tái sử dụng
+// đúng các class .result-item / .explanation-box / .text-green / .text-red đã
+// dùng ở khu vực "Kết quả" ngay sau khi nộp bài.
+function renderQuizHistoryItemHtml(r, exercise) {
+    let dateStr = 'Gần đây';
+    if (r.timestamp && typeof r.timestamp.toDate === 'function') {
+        dateStr = r.timestamp.toDate().toLocaleString('vi-VN');
+    }
+    const scoreColorClass = (r.scorePercentage || 0) >= 50 ? 'text-green' : 'text-red';
+    const title = exercise?.title || `Bài tập (mã ${r.exerciseId || '--'})`;
+
+    let detailHtml = '<p class="empty-state">Bài tập này đã bị xóa khỏi hệ thống nên không thể xem lại chi tiết từng câu.</p>';
+    if (exercise?.questions?.length) {
+        detailHtml = exercise.questions.map((q, idx) => {
+            const userAnswer = r.studentAnswers ? r.studentAnswers[q.id] : null;
+            const correctRaw = q.correct != null ? String(q.correct) : '';
+            const isCorrect = userAnswer != null && String(userAnswer).toLowerCase() === correctRaw.toLowerCase();
+            return `
+            <div class="result-item ${isCorrect ? 'correct' : 'incorrect'}">
+                <h4>Câu ${idx + 1}: ${escapeHtml(q.text || '')}</h4>
+                <p>Đáp án của bạn: <strong class="${isCorrect ? 'text-green' : 'text-red'}">${escapeHtml(userAnswer || '(Bỏ trống)')}</strong></p>
+                ${!isCorrect ? `<p>Đáp án đúng: <strong class="text-green">${escapeHtml(correctRaw)}</strong></p>` : ''}
+                ${q.explanation ? `<p class="explanation-box">💡 <strong>Giải thích:</strong> ${escapeHtml(q.explanation)}</p>` : ''}
+            </div>`;
+        }).join('');
+    }
+
+    return `
+    <div class="quiz-history-item">
+        <button type="button" class="quiz-history-summary">
+            <div class="qh-left">
+                <h4>${escapeHtml(title)}</h4>
+                <p class="qh-time">⏱ ${escapeHtml(dateStr)}</p>
+            </div>
+            <div class="qh-right">
+                <div class="qh-score ${scoreColorClass}">${r.scorePercentage ?? 0}%</div>
+                <p>Đúng ${r.correctAnswers ?? 0} · Sai ${r.mistakes ?? 0}</p>
+            </div>
+            <span class="qh-chevron">▾</span>
+        </button>
+        <div class="quiz-history-detail">${detailHtml}</div>
+    </div>`;
+}
+
+// ============================================================
+// [THÊM MỚI] HỒ SƠ CHI TIẾT (port từ "Hồ sơ chi tiết học viên" bên admin.js /
+// profile.js) — thông tin cá nhân, điểm số tổng hợp, xếp hạng trong lớp, và
+// nhật ký buổi học do giáo viên đánh giá, hiển thị ngay trong trang lớp học.
+// ============================================================
+async function loadStatsProfileDetail(uid) {
+    const wrap = document.getElementById('stats-profile-detail');
+    if (!wrap) return;
+
+    if (!CURRENT_USER_ID) {
+        wrap.classList.add('hidden'); // khách chưa đăng nhập -> không có hồ sơ để hiển thị
+        return;
+    }
+    wrap.classList.remove('hidden');
+
+    const rankBadge = document.getElementById('stats-rank-badge');
+    const infoList = document.getElementById('stats-info-list');
+    const scoreBars = document.getElementById('stats-score-bars');
+    const compositeEl = document.getElementById('stats-composite-score');
+    const sessionsList = document.getElementById('stats-sessions-list');
+
+    rankBadge.textContent = 'Đang tính hạng...';
+    infoList.innerHTML = '';
+    scoreBars.innerHTML = '';
+    sessionsList.innerHTML = '<p class="empty-state">Đang tải nhận xét từ giáo viên...</p>';
+
+    try {
+        const snap = await getDoc(doc(db, 'students', uid));
+        if (!snap.exists()) {
+            wrap.classList.add('hidden'); // chưa có hồ sơ học viên (VD: chỉ mới đăng ký tài khoản, chưa được admin khởi tạo)
+            return;
+        }
+        const student = { id: snap.id, ...snap.data() };
+        if (!student.scores) student.scores = { testScoreAvg: 0, teacherEvalAvg: 0, bonusPoints: 0, participationPoints: 0 };
+
+        // Thông tin cá nhân
+        infoList.innerHTML = STATS_INFO_FIELDS.map((f) => {
+            const raw = student[f.key];
+            let value;
+            if (!raw) value = '<span style="color:var(--text-faint)">Chưa cập nhật</span>';
+            else if (f.type === 'date') value = escapeHtml(formatDateVN(raw));
+            else value = escapeHtml(String(raw));
+            return `<div><dt>${f.label}</dt><dd>${value}</dd></div>`;
+        }).join('');
+
+        // Điểm số tổng hợp
+        const scores = student.scores;
+        const metrics = [
+            { label: 'Điểm kiểm tra trung bình', display: `${round1(scores.testScoreAvg)}/100`, barPct: clampPct(scores.testScoreAvg, 100), cls: '' },
+            { label: 'Điểm GV đánh giá TB / buổi', display: `${round1(scores.teacherEvalAvg)}/10`, barPct: clampPct((scores.teacherEvalAvg || 0) * 10, 100), cls: 'bar-blue' },
+            { label: 'Điểm cộng tích lũy', display: `${scores.bonusPoints || 0} điểm`, barPct: clampPct(scores.bonusPoints, BONUS_BAR_MAX), cls: 'bar-orange' },
+            { label: 'Điểm tích cực phát biểu', display: `${scores.participationPoints || 0} điểm`, barPct: clampPct(scores.participationPoints, PARTICIPATION_BAR_MAX), cls: 'bar-orange' },
+        ];
+        scoreBars.innerHTML = metrics.map((m) => `
+            <div class="score-bar-item ${m.cls}">
+                <div class="score-bar-label"><span>${m.label}</span><strong>${m.display}</strong></div>
+                <div class="score-bar-track"><div class="score-bar-fill" style="width:${m.barPct}%"></div></div>
+            </div>
+        `).join('');
+        compositeEl.textContent = computeCompositeScore(scores);
+
+        // Xếp hạng trong lớp
+        if (!student.classId) {
+            rankBadge.textContent = '🎯 Chưa xếp lớp';
+        } else {
+            try {
+                const classmatesSnap = await getDocs(query(collection(db, 'students'), where('classId', '==', student.classId)));
+                const list = [];
+                classmatesSnap.forEach((d) => list.push({ id: d.id, scores: d.data().scores }));
+                list.sort((a, b) => computeCompositeScore(b.scores) - computeCompositeScore(a.scores));
+                const idx = list.findIndex((x) => x.id === student.id);
+                const rank = idx + 1, total = list.length;
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '🎯';
+                rankBadge.textContent = `${medal} Hạng ${rank}/${total} trong lớp`;
+            } catch (e) {
+                console.error(e);
+                rankBadge.textContent = 'Không xác định được hạng';
+            }
+        }
+
+        // Nhật ký buổi học do giáo viên đánh giá — nhóm theo ngày
+        try {
+            const sessSnap = await getDocs(query(collection(db, 'students', student.id, 'sessions'), orderBy('date', 'desc')));
+            const sessions = [];
+            sessSnap.forEach((d) => sessions.push({ id: d.id, ...d.data() }));
+            renderStatsSessionsList(sessions);
+        } catch (e) {
+            console.error(e);
+            sessionsList.innerHTML = '<p class="empty-state">Chưa thể tải nhận xét buổi học.</p>';
+        }
+    } catch (err) {
+        console.error('Lỗi khi tải hồ sơ chi tiết:', err);
+        wrap.classList.add('hidden');
+    }
+}
+
+function renderStatsSessionsList(sessions) {
+    const list = document.getElementById('stats-sessions-list');
+    if (sessions.length === 0) {
+        list.innerHTML = '<p class="empty-state">Chưa có buổi học nào được giáo viên ghi nhận.</p>';
+        return;
+    }
+    // Nhóm theo ngày (ngày 23, 22, 21...) — đồng nhất với lịch sử làm bài & danh sách bài tập
+    const groups = groupByDay(sessions, (s) => (s.date ? new Date(s.date) : null));
+    list.innerHTML = groups.map((group) => `
+        <div class="day-group">
+            <h4 class="day-group-header">📅 Ngày ${escapeHtml(group.label)}</h4>
+            ${group.items.map((s) => renderSessionItemHtml(s)).join('')}
+        </div>
+    `).join('');
+}
+
+function renderSessionItemHtml(s) {
+    const d = s.date ? new Date(s.date) : null;
+    const validDate = d && !isNaN(d);
+    const day = validDate ? d.getDate() : '--';
+    const month = validDate ? `Th${d.getMonth() + 1}` : '';
+    return `
+    <div class="session-item">
+        <div class="session-date-badge"><span class="day">${day}</span><span class="month">${month}</span></div>
+        <div class="session-body">
+            <h4>${escapeHtml(s.lessonTopic || 'Buổi học')}</h4>
+            <div class="session-chips">
+                <span class="session-chip chip-teacher">GV đánh giá: ${s.teacherScore ?? 0}/10</span>
+                ${s.bonusPoints ? `<span class="session-chip chip-bonus">+${s.bonusPoints} điểm cộng</span>` : ''}
+                ${s.participationPoints ? `<span class="session-chip chip-participation">+${s.participationPoints} phát biểu</span>` : ''}
+            </div>
+            ${s.comment ? `<p class="session-comment">💬 ${escapeHtml(s.comment)}</p>` : ''}
+        </div>
+    </div>`;
 }
  
 // Nút quay lại từ trang thống kê

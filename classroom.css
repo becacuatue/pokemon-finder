@@ -793,7 +793,108 @@ hr{ border:none; border-top:1px solid var(--border-color); margin:26px 0; }
   border:1px solid var(--border-color);
 }
 .history-panel h3{ margin-bottom:20px; font-size:17px; }
- 
+
+/* ---------- [THÊM MỚI] NHÓM THEO NGÀY (dùng chung cho: danh sách bài tập trong
+   lớp, lịch sử làm bài kiểm tra, nhật ký buổi học của giáo viên) ---------- */
+.day-group{ margin-bottom:28px; }
+.day-group:last-child{ margin-bottom:0; }
+.day-group-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:14px;
+  font-weight:700;
+  color:var(--matcha-primary-dark);
+  background:var(--matcha-pale);
+  border:1px solid var(--matcha-badge-bg);
+  padding:9px 16px;
+  border-radius:var(--radius-pill);
+  margin-bottom:16px;
+  width:fit-content;
+}
+.day-group-grid{ margin-bottom:0; }
+
+/* ---------- [THÊM MỚI] LỊCH SỬ LÀM BÀI KIỂM TRA — CÓ THỂ MỞ RỘNG XEM CHI TIẾT
+   TỪNG CÂU (tái sử dụng .result-item / .explanation-box / .text-green / .text-red
+   đã có sẵn ở khu vực "Kết quả" ngay sau khi nộp bài). ---------- */
+.quiz-history-item{
+  background:var(--white);
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-m);
+  margin-bottom:12px;
+  overflow:hidden;
+  transition:box-shadow .15s ease;
+}
+.quiz-history-item:hover{ box-shadow:var(--shadow-soft); }
+.quiz-history-summary{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:16px 20px;
+  text-align:left;
+  font-family:var(--font-main);
+}
+.qh-left{ flex:1; min-width:0; }
+.qh-left h4{ margin:0 0 4px; font-size:14.5px; color:var(--text-dark); }
+.qh-time{ margin:0; font-size:12.5px; color:var(--text-muted); }
+.qh-right{ text-align:right; flex:none; }
+.qh-score{ font-size:19px; font-weight:800; line-height:1.2; }
+.qh-right p{ margin:0; font-size:12.5px; color:var(--text-muted); }
+.qh-chevron{
+  flex:none;
+  color:var(--text-faint);
+  font-size:18px;
+  transition:transform .2s ease;
+}
+.quiz-history-item.is-open .qh-chevron{ transform:rotate(180deg); }
+.quiz-history-detail{
+  max-height:0;
+  overflow:hidden;
+  padding:0 20px;
+  transition:max-height .25s ease, padding .25s ease;
+}
+.quiz-history-item.is-open .quiz-history-detail{
+  max-height:4000px;
+  padding:4px 20px 20px;
+  border-top:1px solid var(--border-color);
+}
+.quiz-history-detail .result-item{ margin-bottom:10px; }
+.quiz-history-detail .result-item:last-child{ margin-bottom:0; }
+
+/* ---------- [THÊM MỚI] THẺ THÔNG TIN GIÁO VIÊN PHỤ TRÁCH LỚP ----------
+   Đặt trong dashboard-section (danh sách bài tập của 1 lớp). Dữ liệu đọc
+   từ document lớp (classes/{id}): teacherName, teacherTitle, teacherPhotoUrl,
+   teacherBio — các field này CHƯA có trong admin.js, bạn có thể bổ sung
+   CLASS_FIELDS bên admin.js sau; giao diện đã sẵn sàng để hiển thị ngay
+   khi dữ liệu tồn tại, và hiện trạng thái "Chưa cập nhật" khi chưa có. */
+.teacher-info-card{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  background:var(--surface-tint);
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-l);
+  padding:18px 22px;
+  margin-bottom:26px;
+}
+.teacher-avatar-wrap{ flex:none; }
+.teacher-avatar{
+  width:64px; height:64px;
+  border-radius:50%;
+  object-fit:cover;
+  background:var(--matcha-badge-bg);
+  color:var(--matcha-primary-dark);
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; font-weight:700;
+  border:2px solid var(--white);
+  box-shadow:0 0 0 1px var(--border-color);
+}
+.teacher-info-body{ flex:1; min-width:0; }
+.teacher-info-body h3{ font-size:16.5px; margin:2px 0 3px; }
+.teacher-title{ margin:0 0 4px; font-size:12.5px; font-weight:600; color:var(--matcha-primary-dark); }
+.teacher-bio{ margin:0; font-size:13px; color:var(--text-muted); }
+
 /* ---------- 13. FOOTER ---------- */
 .site-footer{
   margin-top:40px;
@@ -811,4 +912,7 @@ hr{ border:none; border-top:1px solid var(--border-color); margin:26px 0; }
   .grid{ grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); }
   .stats-grid{ grid-template-columns:1fr 1fr; }
   .result-hero{ flex-direction:column; align-items:flex-start; }
+  .teacher-info-card{ flex-direction:column; text-align:center; }
+  .quiz-history-summary{ flex-wrap:wrap; }
+  .qh-right{ text-align:left; }
 }

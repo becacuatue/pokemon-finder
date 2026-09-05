@@ -54,7 +54,7 @@
 
         <div class="profile-welcome">
             <p class="welcome-eyebrow">Hồ sơ học viên</p>
-            <h1>Xin chào, <span id="profile-name-inline">bạn</span> 👋</h1>
+            <h1>Xin chào, <span id="profile-name-inline">bạn</span> </h1>
         </div>
 
         <div class="student-profile-header">
@@ -89,6 +89,15 @@
                 <h3>🗓 Nhận xét của giáo viên qua từng buổi học</h3>
             </div>
             <div id="profile-sessions-list" class="sessions-list"></div>
+        </div>
+
+        <!-- ================= [THÊM MỚI] LỊCH SỬ LÀM BÀI KIỂM TRA CHI TIẾT =================
+             Trước đây trang này chỉ có 1 con số "điểm kiểm tra trung bình" — giờ hiện
+             luôn danh sách từng lượt làm bài, nhóm theo ngày, bấm vào để xem lại chi
+             tiết từng câu (tái sử dụng đúng css/cơ chế .quiz-history-item bên classroom.css). -->
+        <div class="history-panel" style="margin-top:30px;">
+            <h3>📝 Lịch sử làm bài kiểm tra (nhóm theo ngày, bấm vào để xem chi tiết từng câu)</h3>
+            <div id="profile-quiz-history" class="detailed-results-container"></div>
         </div>
     </section>
 

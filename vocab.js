@@ -13,8 +13,8 @@
 const VOCAB_DATA_URL = 'vocab-data.json';
 const LS_POINTS_KEY = 'dtedu_vocab_total_points';
 const LS_MASTERED_KEY = 'dtedu_vocab_mastered_words';
-const MAX_APPEARANCES_PER_SESSION = 2; // trần số lần 1 từ xuất hiện trong 1 phiên
-const MASTER_BOX = 1;                  // đúng liên tiếp 2 lần trong phiên -> coi như thuộc
+const MAX_APPEARANCES_PER_SESSION = 3; // trần số lần 1 từ xuất hiện trong 1 phiên
+const MASTER_BOX = 2;                  // đúng liên tiếp 2 lần trong phiên -> coi như thuộc
 const HISTORY_LIMIT = 18;              // số chấm hiển thị trong biểu đồ lịch sử gần đây
 
 let allLevels = [];       // toàn bộ dữ liệu levels từ JSON
