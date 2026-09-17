@@ -17,14 +17,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* Công thức điểm tổng hợp GIỐNG HỆT bên admin.js — nếu chỉnh công thức bên đó
-   thì nhớ chỉnh lại ở đây cho khớp (2 file độc lập, không dùng chung module). */
 const SCORE_WEIGHTS = { test: 0.5, teacherEval: 0.3 };
 const BONUS_BAR_MAX = 30;
 const PARTICIPATION_BAR_MAX = 30;
 
-// Các trường thông tin cá nhân hiển thị (khớp STUDENT_FIELDS bên admin.js,
-// trừ linkedAuthUid vì đó là field kỹ thuật, không cần cho học viên xem)
 const STUDENT_INFO_FIELDS = [
     { key: 'dob', label: 'Ngày sinh', type: 'date' },
     { key: 'gender', label: 'Giới tính' },
@@ -34,6 +30,8 @@ const STUDENT_INFO_FIELDS = [
     { key: 'email', label: 'Email' },
     { key: 'notes', label: 'Ghi chú từ giáo viên' },
 ];
+let scoreChartInstance = null;
+let currentStudentData = null;
 
 // ---------- TIỆN ÍCH (giống admin.js để đồng bộ cách hiển thị) ----------
 const $ = (sel) => document.querySelector(sel);
@@ -268,13 +266,6 @@ function renderSessionItemHtml(s) {
     </div>`;
 }
 
-// ============================================================
-// [THÊM MỚI] LỊCH SỬ LÀM BÀI KIỂM TRA CHI TIẾT (port từ classroom.js)
-// Trước đây trang Hồ sơ chỉ hiện 1 con số "điểm kiểm tra trung bình" — giờ
-// hiện luôn danh sách TỪNG LƯỢT làm bài, nhóm theo ngày, bấm vào để xem lại
-// chi tiết từng câu (đúng/sai, đáp án đúng, giải thích) — y hệt cơ chế và
-// giao diện đã dùng ở trang lớp học (classroom.js / .quiz-history-item).
-// ============================================================
 async function loadQuizHistory(studentId) {
     const container = $('#profile-quiz-history');
     if (!container) return;
@@ -304,7 +295,7 @@ async function loadQuizHistory(studentId) {
         const groups = groupByDay(resultsRaw, (r) => (r.timestamp?.toDate ? r.timestamp.toDate() : null));
         container.innerHTML = groups.map((group) => `
             <div class="day-group">
-                <h4 class="day-group-header">📅 Ngày ${escapeHtml(group.label)}</h4>
+                <h4 class="day-group-header"> Ngày ${escapeHtml(group.label)}</h4>
                 ${group.items.map((r) => renderQuizHistoryItemHtml(r, exerciseMap[r.exerciseId])).join('')}
             </div>
         `).join('');
@@ -316,6 +307,74 @@ async function loadQuizHistory(studentId) {
         console.error('Lỗi khi tải lịch sử làm bài:', err);
         container.innerHTML = '<p class="empty-state">Không thể tải lịch sử làm bài kiểm tra.</p>';
     }
+    loadStudentHistory(studentId)
+}
+let counts = 1;
+const button = document.getElementById("open")
+button.addEventListener("click", () =>{
+    counts += 1;
+    if (counts % 2 !== 0){
+        document.getElementById("profile-quiz-history").classList.add('detailed-results-container');
+        document.getElementById("profile-quiz-history").classList.remove('detailed-results-container-open');
+    }
+    else{
+        document.getElementById("profile-quiz-history").classList.remove('detailed-results-container');
+        document.getElementById("profile-quiz-history").classList.add('detailed-results-container-open');
+    }
+    console.log("ssss");
+});
+// 2. Lấy lịch sử làm bài và vẽ biểu đồ
+async function loadStudentHistory(studentId) {
+    // Lấy thông tin học sinh
+    const stuSnap = await getDoc(doc(db, 'students', studentId));
+    currentStudentData = stuSnap.data();
+
+    // Lấy kết quả làm bài
+    const q = query(collection(db, "results"), where("userId", "==", studentId));
+    const resultsSnap = await getDocs(q);
+    
+    let submissions = [];
+    resultsSnap.forEach(r => submissions.push({ id: r.id, ...r.data() }));
+    
+    // Sắp xếp thời gian (mới nhất lên trước)
+    submissions.sort((a, b) => b.timestamp?.toMillis() - a.timestamp?.toMillis());
+    renderChart(submissions);
+}
+
+// 3. Render biểu đồ Chart.js
+function renderChart(submissions) {
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+    if (scoreChartInstance) scoreChartInstance.destroy(); // Hủy chart cũ nếu có
+
+    // Đảo ngược mảng để vẽ từ cũ -> mới
+    const chartData = [...submissions].reverse(); 
+    
+    const labels = chartData.map((sub, index) => {
+        if(sub.timestamp && typeof sub.timestamp.toDate === 'function') {
+            const d = sub.timestamp.toDate();
+            return `${d.getDate()}/${d.getMonth()+1}`;
+        }
+        return `Bài ${index + 1}`;
+    });
+    
+    const scores = chartData.map(sub => sub.scorePercentage || 0);
+
+    scoreChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Điểm số (%)',
+                data: scores,
+                borderColor: '#7EA88A', // Matcha primary
+                backgroundColor: 'rgba(126, 168, 138, 0.2)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { responsive: true, scales: { y: { min: 0, max: 100 } } }
+    });
 }
 
 function renderQuizHistoryItemHtml(r, exercise) {

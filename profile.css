@@ -1,12 +1,4 @@
-/* =========================================================
-   DTEDU — TRANG HỒ SƠ CÁ NHÂN HỌC VIÊN (profile.html)
-   Dùng chung biến màu & thành phần cơ bản với classroom.css
-   (.container, .panel-card, .btn, .nav-user-chip...).
-   Các khối bên dưới lấy cảm hứng từ hồ sơ chi tiết bên trang
-   Admin nhưng được rút gọn cho học viên (chỉ xem, không sửa).
-   ========================================================= */
 
-/* ---------- 1. TRẠNG THÁI RỖNG (chưa đăng nhập / chưa có hồ sơ) ---------- */
 .profile-empty-state{
   text-align:center;
   padding:50px 20px;
@@ -33,11 +25,18 @@
 
 /* ---------- 3. KHỐI THÔNG TIN ĐẦU HỒ SƠ ---------- */
 .student-profile-header{
-  display:flex; align-items:center; gap:24px; flex-wrap:wrap;
+  display:flex; 
+  align-items:center; 
+  gap:24px; 
+  flex-wrap:nowrap;
   padding-bottom:24px; margin-bottom:24px;
   border-bottom:1px solid var(--border-color);
 }
-.profile-avatar-wrap{ position:relative; flex:none; }
+.profile-avatar-wrap{
+  position:relative;
+  flex:none;
+  margin-right: 20%;
+}
 .profile-avatar{
   width:96px; height:96px; border-radius:50%;
   object-fit:cover;

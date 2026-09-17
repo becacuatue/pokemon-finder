@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
  
 /* ---------- 1. DESIGN TOKENS ---------- */
 :root{
@@ -44,7 +44,7 @@
   --shadow-card: 0 10px 30px -12px rgba(34,48,42,.18);
   --shadow-lift: 0 20px 40px -16px rgba(34,48,42,.28);
  
-  --font-main: 'Poppins', sans-serif;
+  --font-main: 'Montserrat', sans-serif;
 }
  
 /* ---------- 2. RESET & BASE ---------- */
@@ -59,6 +59,7 @@ body{
   background:var(--matcha-pale);
   -webkit-font-smoothing:antialiased;
   line-height:1.6;
+  font-weight: 400;
 }
  
 h1,h2,h3,h4{ margin:0 0 .5em; font-weight:700; letter-spacing:-0.01em; color:var(--text-dark); }
@@ -774,14 +775,20 @@ hr{ border:none; border-top:1px solid var(--border-color); margin:26px 0; }
 .stat-value{ font-size:27px; font-weight:800; }
 .text-blue{ color:#8FC1F2; }
 .text-orange{ color:#F2B673; }
- 
-.detailed-results-container{ display:flex; flex-direction:column; gap:12px; }
-.detailed-results-container .result-item{
-  transition:transform .15s ease, box-shadow .15s ease;
+.detailed-results-container{ 
+  display:flex;
+  flex-direction:column; 
+  gap:12px;
+  max-height: 200px;
+  overflow: hidden;
+  transition:max-height .25s ease, padding .25s ease;
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 100%);
+  mask-image: linear-gradient(to top, transparent 0%, black 100%);
 }
-.detailed-results-container .result-item:hover{
-  transform:translateY(-2px);
-  box-shadow:var(--shadow-soft);
+.detailed-results-container-open{
+  max-height:4000px;
+  padding:4px 20px 20px;
+  border-top:1px solid var(--border-color);
 }
  
 .panel-card.wide{ max-width:1280px; }
@@ -791,6 +798,7 @@ hr{ border:none; border-top:1px solid var(--border-color); margin:26px 0; }
   padding:30px clamp(18px,3vw,34px);
   border-radius:var(--radius-l);
   border:1px solid var(--border-color);
+
 }
 .history-panel h3{ margin-bottom:20px; font-size:17px; }
 
@@ -862,12 +870,6 @@ hr{ border:none; border-top:1px solid var(--border-color); margin:26px 0; }
 .quiz-history-detail .result-item{ margin-bottom:10px; }
 .quiz-history-detail .result-item:last-child{ margin-bottom:0; }
 
-/* ---------- [THÊM MỚI] THẺ THÔNG TIN GIÁO VIÊN PHỤ TRÁCH LỚP ----------
-   Đặt trong dashboard-section (danh sách bài tập của 1 lớp). Dữ liệu đọc
-   từ document lớp (classes/{id}): teacherName, teacherTitle, teacherPhotoUrl,
-   teacherBio — các field này CHƯA có trong admin.js, bạn có thể bổ sung
-   CLASS_FIELDS bên admin.js sau; giao diện đã sẵn sàng để hiển thị ngay
-   khi dữ liệu tồn tại, và hiện trạng thái "Chưa cập nhật" khi chưa có. */
 .teacher-info-card{
   display:flex;
   align-items:center;

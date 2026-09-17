@@ -19,13 +19,9 @@ let CURRENT_USER_ID = null;
 let availableExercises = [];
 let currentTestSession = null;
 
-// [THÊM MỚI] Tập hợp ID các bài tập học viên đã làm (tô xanh nhạt trong danh sách bài)
 let completedExerciseIds = new Set();
 
-// [THÊM MỚI] Bộ đếm giờ khi làm bài
 let countdownIntervalId = null;
-
-// [THÊM MỚI] Công thức điểm tổng hợp — PHẢI khớp với admin.js/profile.js
 const SCORE_WEIGHTS = { test: 0.5, teacherEval: 0.3 };
 function computeCompositeScore(scores = {}) {
     const test = scores?.testScoreAvg || 0;
@@ -34,17 +30,10 @@ function computeCompositeScore(scores = {}) {
     const participation = scores?.participationPoints || 0;
     return Math.round(test * SCORE_WEIGHTS.test + teacher * 10 * SCORE_WEIGHTS.teacherEval + bonus + participation);
 }
-
-// [THÊM MỚI] Escape HTML để chèn dữ liệu (tên lớp, tiêu đề bài...) an toàn hơn
 function escapeHtml(str = '') {
     return String(str).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 }
 
-// ============================================================
-// [THÊM MỚI] "HỒ SƠ CHI TIẾT" PORT TỪ ADMIN.JS / PROFILE.JS
-// Dùng để hiển thị ngay trong trang "Kết quả học tập" của lớp học,
-// không phải sửa đổi công thức điểm hay logic — chỉ đọc & hiển thị.
-// ============================================================
 const STATS_INFO_FIELDS = [
     { key: 'dob', label: 'Ngày sinh', type: 'date' },
     { key: 'gender', label: 'Giới tính' },
@@ -66,9 +55,6 @@ function formatDateVN(dateStr) {
 function round1(n) { return Math.round((n || 0) * 10) / 10; }
 function clampPct(value, max) { if (!max) return 0; return Math.max(0, Math.min(100, ((value || 0) / max) * 100)); }
 
-// [THÊM MỚI] Nhóm 1 danh sách theo NGÀY (dùng chung cho: bài tập trong lớp,
-// lịch sử làm bài kiểm tra, nhật ký buổi học) — sắp xếp ngày gần nhất lên đầu,
-// ví dụ: 23/08, 22/08, 21/08... Mục nào thiếu ngày hợp lệ sẽ gom vào cuối cùng.
 function groupByDay(items, dateGetter) {
     const buckets = new Map();
     items.forEach((item) => {
@@ -91,15 +77,10 @@ function groupByDay(items, dateGetter) {
     });
 }
  
-// ============================================================
-// [THÊM MỚI] Hằng số & tiện ích hiển thị thông tin học viên /
-// lớp đang học. Phần này chỉ CHÈN THÊM giao diện, không thay
-// đổi bất kỳ luồng xử lý (logic) nào ở phía dưới.
-// ============================================================
 const LAST_CLASS_STORAGE_KEY = 'dtedu_current_class_name';
-// Bổ sung hàm lấy danh sách lớp học cho giao diện Học viên
+
 async function loadClassesList() {
-    // Trỏ đúng vào ID 'classes-grid' để không ghi đè phần đánh giá và welcome-bar
+   
     const classContainer = document.getElementById('classes-grid');
 
     try {
@@ -114,8 +95,6 @@ async function loadClassesList() {
         querySnapshot.forEach((docSnap) => {
             classes.push({ id: docSnap.id, ...docSnap.data() });
         });
-        // Sắp xếp theo tên cho dễ tìm (không dùng orderBy phía Firestore — sẽ âm thầm
-        // loại bỏ những lớp thiếu field dùng để sắp xếp mà không báo lỗi gì cả)
         classes.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'));
 
         classContainer.innerHTML = '';
@@ -135,7 +114,7 @@ async function loadClassesList() {
     }
 }
 
-// Lấy chữ cái đầu để hiển thị avatar tròn khi chưa có ảnh đại diện
+
 function getInitials(text) {
     if (!text) return '?';
     const clean = text.trim();
@@ -146,7 +125,6 @@ function getInitials(text) {
     return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
  
-// Cập nhật thanh chào mừng + chip trên navbar dựa theo trạng thái đăng nhập
 function renderStudentInfo(user) {
     const nameEl = document.getElementById('student-name');
     const avatarEl = document.getElementById('student-avatar');
@@ -184,18 +162,17 @@ window.toggleUserInfo = function() {
     }
 };
 window.handleLogout = function() {
-    // Xóa dữ liệu lớp học đang lưu tạm (tùy chọn)
+   
     localStorage.removeItem('dtedu_current_class_name'); 
     
     signOut(auth).then(() => {
-        // Đăng xuất thành công, tải lại trang hoặc chuyển về trang chủ
+       
         window.location.href = 'index.html'; 
     }).catch((error) => {
         console.error("Lỗi đăng xuất:", error);
         alert("Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại!");
     });
 };
-// Đóng khung thông tin nếu click ra ngoài vùng nav-user-chip
 document.addEventListener('click', (e) => {
     const chip = document.getElementById('nav-user-chip');
     const dropdown = document.getElementById('user-info-dropdown');
@@ -203,7 +180,6 @@ document.addEventListener('click', (e) => {
         dropdown.style.display = 'none';
     }
 });
-// Ghi nhớ & hiển thị khóa học học viên đang xem/luyện tập gần nhất
 function setCurrentClassDisplay(className) {
     const el = document.getElementById('student-current-class');
     if (el) el.textContent = className || 'Chưa chọn khóa học';
@@ -212,7 +188,7 @@ function setCurrentClassDisplay(className) {
 function rememberCurrentClass(className) {
     try {
         localStorage.setItem(LAST_CLASS_STORAGE_KEY, className);
-    } catch (e) { /* bỏ qua nếu trình duyệt chặn localStorage */ }
+    } catch (e) {}
     setCurrentClassDisplay(className);
 }
  
@@ -220,13 +196,9 @@ function loadRememberedClass() {
     try {
         const saved = localStorage.getItem(LAST_CLASS_STORAGE_KEY);
         if (saved) setCurrentClassDisplay(saved);
-    } catch (e) { /* bỏ qua nếu trình duyệt chặn localStorage */ }
+    } catch (e) {  }
 }
-// ============================================================
-// [THÊM MỚI] Bài đã hoàn thành + Banner "Lớp đang học"
-// ============================================================
 
-// Tải danh sách ID bài tập học viên đã làm (dùng để tô xanh nhạt + tính tiến độ)
 async function loadCompletedExerciseIds() {
     const userId = CURRENT_USER_ID || "guest_test_user";
     try {
@@ -241,10 +213,7 @@ async function loadCompletedExerciseIds() {
         console.error("Lỗi khi tải danh sách bài đã làm:", error);
     }
 }
-
-// Banner "Lớp đang học" ở đầu trang: tiến độ / điểm / hạng của học viên trong LỚP THẬT
-// mà admin đã gán (students/{uid}.classId) — khác với "lớp đang xem gần nhất" ở welcome-bar.
-let myClassInfo = null; // { id, name }
+let myClassInfo = null; 
 
 async function loadMyClassSummary() {
     const banner = document.getElementById('my-class-banner');
@@ -269,7 +238,7 @@ async function loadMyClassSummary() {
 
         myClassInfo = { id: student.classId, name: student.className || 'Lớp của bạn' };
 
-        // Đếm tổng số bài tập của lớp + số bài đã hoàn thành trong lớp đó
+        
         const exSnap = await getDocs(query(collection(db, 'exercises'), where('targetClass', '==', student.classId)));
         const classExerciseIds = [];
         exSnap.forEach((d) => classExerciseIds.push(d.id));
@@ -277,7 +246,7 @@ async function loadMyClassSummary() {
         const doneInClass = classExerciseIds.filter((id) => completedExerciseIds.has(id)).length;
         const progressPct = totalInClass > 0 ? Math.round((doneInClass / totalInClass) * 100) : 0;
 
-        // Tính hạng trong lớp (cùng công thức & cách làm như admin.js/profile.js)
+        
         let rankText = '--';
         try {
             const classmatesSnap = await getDocs(query(collection(db, 'students'), where('classId', '==', student.classId)));
@@ -290,7 +259,7 @@ async function loadMyClassSummary() {
             console.error('Lỗi khi tính hạng:', rankErr);
         }
 
-        // Đổ dữ liệu vào banner
+        
         document.getElementById('my-class-name').textContent = student.className || 'Lớp của bạn';
         document.getElementById('my-class-progress-fill').style.width = `${progressPct}%`;
         document.getElementById('my-class-progress-text').textContent = `${doneInClass}/${totalInClass} bài đã làm`;
@@ -308,15 +277,12 @@ document.getElementById('btn-goto-my-class')?.addEventListener('click', () => {
     if (myClassInfo) window.loadExercisesForClass(myClassInfo.id, myClassInfo.name);
 });
 
-// ============================================================
-// [HẾT PHẦN THÊM MỚI]
-// ============================================================
  
-// Gộp chung khởi tạo trang và kiểm tra đăng nhập
+
 document.addEventListener('DOMContentLoaded', () => {
     loadRememberedClass(); 
     
-    // Gọi hàm tải danh sách lớp vào đúng ID 'classes-grid'
+    
     loadClassesList();
 
     onAuthStateChanged(auth, async (user) => {
@@ -326,12 +292,12 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Đang test chế độ chưa đăng nhập...");
         }
         renderStudentInfo(user);
-        await loadCompletedExerciseIds(); // [THÊM MỚI] cần có trước để tô xanh bài đã làm + tính tiến độ
+        await loadCompletedExerciseIds(); 
         loadDashboardStats();
-        loadMyClassSummary(); // [THÊM MỚI] banner "Lớp đang học": tiến độ / điểm / hạng
+        loadMyClassSummary(); 
     });
 
-    // Bắt sự kiện submit form để chấm điểm
+    
     const quizForm = document.getElementById('quiz-form');
     if (quizForm) {
         quizForm.addEventListener('submit', (e) => {
@@ -341,18 +307,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
  
-// Gán hàm vào window để HTML gọi được (onclick)
+
 window.goBackToClasses = function() {
     document.getElementById('dashboard-section').classList.add('hidden');
     document.getElementById('class-selection-section').classList.remove('hidden');
 }
  
 window.goBackToDashboard = function() {
-    stopCountdown(); // [THÊM MỚI] dừng đếm ngược nếu thoát làm bài giữa chừng
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // [THÊM MỚI] dừng đọc từ vựng nếu còn đang phát
+    stopCountdown(); 
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel(); 
     document.getElementById('test-section').classList.add('hidden');
     document.getElementById('result-section').classList.add('hidden');
-    document.getElementById('lesson-vocab-warmup-section')?.classList.add('hidden'); // [THÊM MỚI]
+    document.getElementById('lesson-vocab-warmup-section')?.classList.add('hidden'); 
     document.getElementById('dashboard-section').classList.remove('hidden');
 }
  
@@ -361,9 +327,9 @@ window.loadExercisesForClass = async function(classId, className) {
     document.getElementById('dashboard-section').classList.remove('hidden');
     document.getElementById('current-class-title').textContent = `Bài tập: ${className}`;
  
-    rememberCurrentClass(className); // [THÊM MỚI] ghi nhớ + hiển thị khóa học đang chọn
+    rememberCurrentClass(className);
 
-    loadClassTeacherCard(classId); // [THÊM MỚI] thông tin giáo viên phụ trách lớp (không chặn tải bài tập)
+    loadClassTeacherCard(classId); 
  
     const grid = document.getElementById('lesson-grid');
     grid.innerHTML = '<p>Đang tải dữ liệu bài tập...</p>';
@@ -377,8 +343,6 @@ window.loadExercisesForClass = async function(classId, className) {
             availableExercises.push({ id: doc.id, ...doc.data() });
         });
 
-        // [THÊM MỚI] Bài mới nhất lên đầu, cũ hơn xuống dưới. Không dùng orderBy phía
-        // Firestore vì sẽ âm thầm loại bỏ bài thiếu field "createdAt" khỏi kết quả.
         availableExercises.sort((a, b) => {
             const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
             const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
@@ -390,8 +354,6 @@ window.loadExercisesForClass = async function(classId, className) {
             return;
         }
 
-        // [THÊM MỚI] Nhóm bài tập theo NGÀY tạo (createdAt), ví dụ: ngày 23, 22, 21...
-        // Bài chưa có createdAt sẽ gom vào nhóm "Chưa rõ ngày" ở cuối cùng.
         grid.innerHTML = '';
         const dayGroups = groupByDay(availableExercises, (t) => (t.createdAt?.toDate ? t.createdAt.toDate() : null));
 
@@ -405,11 +367,11 @@ window.loadExercisesForClass = async function(classId, className) {
 
             group.items.forEach((test) => {
                 const card = document.createElement('div');
-                const isDone = completedExerciseIds.has(test.id); // [THÊM MỚI]
+                const isDone = completedExerciseIds.has(test.id); // 
                 card.className = 'card' + (isDone ? ' already-done' : '');
                 const audioBadge = test.audioUrl ? `<span class="meta-chip meta-chip-audio">🎧 Có bài nghe</span>` : '';
-                const doneBadge = isDone ? `<span class="done-badge">✓ Đã hoàn thành</span>` : ''; // [THÊM MỚI]
-                const vocabBadge = (test.vocabWarmup && test.vocabWarmup.length) ? `<span class="meta-chip">🔤 Khởi động từ vựng</span>` : ''; // [THÊM MỚI]
+                const doneBadge = isDone ? `<span class="done-badge">✓ Đã hoàn thành</span>` : ''; 
+                const vocabBadge = (test.vocabWarmup && test.vocabWarmup.length) ? `<span class="meta-chip">🔤 Khởi động từ vựng</span>` : ''; 
                 card.innerHTML = `
                     ${doneBadge}
                     <h3>${escapeHtml(test.title || '')}</h3>
@@ -424,7 +386,7 @@ window.loadExercisesForClass = async function(classId, className) {
                 `;
                 subGrid.appendChild(card);
 
-                // Gắn sự kiện click
+                
                 card.querySelector(`#btn-start-${test.id}`).addEventListener('click', () => startTest(test.id));
             });
 
@@ -437,11 +399,6 @@ window.loadExercisesForClass = async function(classId, className) {
     }
 }
 
-// [THÊM MỚI] Thẻ thông tin giáo viên phụ trách lớp — đọc từ classes/{id}:
-// teacherName, teacherTitle, teacherPhotoUrl, teacherBio. Các field này CHƯA
-// được quản lý trong admin.js — cứ để giao diện sẵn đây, khi nào bổ sung field
-// đó vào admin (CLASS_FIELDS) và điền dữ liệu thì thẻ sẽ tự hiển thị đúng,
-// không cần sửa gì thêm ở đây.
 async function loadClassTeacherCard(classId) {
     const nameEl = document.getElementById('class-teacher-name');
     const titleEl = document.getElementById('class-teacher-title');
@@ -450,7 +407,6 @@ async function loadClassTeacherCard(classId) {
     const fallbackEl = document.getElementById('class-teacher-avatar-fallback');
     if (!nameEl) return;
 
-    // Trạng thái mặc định trong lúc tải / khi chưa có dữ liệu
     nameEl.textContent = 'Đang cập nhật...';
     titleEl.textContent = '';
     bioEl.textContent = 'Thông tin giáo viên sẽ được cập nhật sớm.';
@@ -479,7 +435,6 @@ async function loadClassTeacherCard(classId) {
     }
 }
  
-// [THÊM MỚI] Đếm ngược thời gian làm bài — thay cho việc chỉ hiện số phút tĩnh trước đây
 function stopCountdown() {
     if (countdownIntervalId) {
         clearInterval(countdownIntervalId);
@@ -489,7 +444,7 @@ function stopCountdown() {
 }
 
 function startCountdown(minutes) {
-    stopCountdown(); // đảm bảo không có bộ đếm cũ nào còn chạy song song
+    stopCountdown(); 
 
     let remainingSeconds = Math.max(0, Math.round((parseFloat(minutes) || 0) * 60));
     const timerEl = document.getElementById('timer');
@@ -517,15 +472,12 @@ function startCountdown(minutes) {
     }, 1000);
 }
 
-// Bắt đầu làm bài
-// [THÊM MỚI] Trước khi vào bài thật, kiểm tra xem bài này có mảng "vocabWarmup"
-// không — nếu có thì cho học viên khởi động từ vựng trước (xem maybeStartVocabWarmup).
 function startTest(testId) {
     const test = availableExercises.find(t => t.id === testId);
     if (!test) return;
     currentTestSession = test;
 
-    if (maybeStartVocabWarmup(test)) return; // có từ vựng khởi động -> dừng ở đây, vào bài thật sau khi xong/bỏ qua
+    if (maybeStartVocabWarmup(test)) return; 
     proceedToRealTest(testId);
 }
 
@@ -537,7 +489,7 @@ function proceedToRealTest(testId) {
     document.getElementById('test-section').classList.remove('hidden');
  
     document.getElementById('current-test-title').textContent = currentTestSession.title;
-    startCountdown(currentTestSession.timeLimit); // [THÊM MỚI] đếm ngược thật, tự nộp bài khi hết giờ
+    startCountdown(currentTestSession.timeLimit); 
     
     let audioHtml = '';
     if (currentTestSession.audioParts && currentTestSession.audioParts.length > 0) {
@@ -554,7 +506,6 @@ function proceedToRealTest(testId) {
             }
         });
     } 
-    // 2. Tương thích ngược: Đọc định dạng cũ nếu bài tập chỉ có trường audioUrl đơn lẻ
     else if (currentTestSession.audioUrl) {
         audioHtml = `
             <div class="audio-player-box">
@@ -573,7 +524,6 @@ function proceedToRealTest(testId) {
 
     document.getElementById('test-content').innerHTML = audioHtml + passageHtml;
  
-    // Render cột phải (Câu hỏi)
     const qContainer = document.getElementById('questions-container');
     qContainer.innerHTML = '';
  
@@ -581,7 +531,6 @@ function proceedToRealTest(testId) {
         const block = document.createElement('div');
         block.className = 'question-block';
         
-        // Render hình ảnh nếu câu hỏi có ảnh
         const imgHtml = q.imageUrl ? `<img src="${q.imageUrl}" class="q-img" alt="Hình ảnh">` : '';
  
         let inputsHtml = '';
@@ -602,19 +551,6 @@ function proceedToRealTest(testId) {
     });
 }
 
-// ============================================================
-// [THÊM MỚI] KHỞI ĐỘNG TỪ VỰNG TRƯỚC KHI LÀM BÀI
-// Tái sử dụng NGUYÊN VẸN css & cơ chế của module luyện từ vựng độc lập
-// (xem vocab.css / vocab.js): 1 từ tiếng Anh + tự đọc phát âm bằng Web
-// Speech API + chọn 1 trong 4 đáp án nghĩa tiếng Việt.
-//
-// CƠ CHẾ "CHỜ ĐỒNG BỘ SAU": bài tập nào có field `vocabWarmup` (mảng object
-// dạng { word, phonetic, partOfSpeech, meaning, example, exampleTranslation }
-// — ĐÚNG cấu trúc như trong vocab-data.json) sẽ tự động hiện bước khởi động
-// từ vựng này trước khi vào bài. Bài KHÔNG có field này (mặc định với toàn
-// bộ dữ liệu hiện tại) sẽ bỏ qua và vào thẳng bài làm như trước — không cần
-// sửa code gì thêm khi bạn đồng bộ/nhập dữ liệu vocabWarmup sau này.
-// ============================================================
 let lessonVocabQueue = [];
 let lessonVocabWord = null;
 let lessonVocabTotal = 0;
@@ -764,14 +700,12 @@ document.getElementById('btn-continue-to-test')?.addEventListener('click', () =>
     document.getElementById('lesson-vocab-warmup-section').classList.add('hidden');
     proceedToRealTest(pendingTestIdAfterWarmup);
 });
-// Chấm điểm và Lưu
-// [THÊM MỚI] Chống nộp bài trùng lặp (hết giờ tự nộp đúng lúc học viên bấm nộp tay)
 let isSubmittingTest = false;
 
 async function evaluateAndSaveTest() {
     if (isSubmittingTest) return;
     isSubmittingTest = true;
-    stopCountdown(); // dừng đếm ngược ngay khi bắt đầu nộp bài (nộp tay hoặc hết giờ)
+    stopCountdown();
     const submitBtn = document.querySelector('.btn-submit');
     const originalBtnText = submitBtn.textContent;
     submitBtn.textContent = 'Đang chấm điểm & lưu kết quả...';
@@ -801,17 +735,15 @@ async function evaluateAndSaveTest() {
                 <h4>Câu ${index + 1}: ${q.text}</h4>
                 <p>Đáp án của bạn: <strong class="${isCorrect ? 'text-green' : 'text-red'}">${userAnswer || '(Bỏ trống)'}</strong></p>
                 ${!isCorrect ? `<p>Đáp án đúng: <strong class="text-green">${q.correct}</strong></p>` : ''}
-                <p class="explanation-box">💡 <strong>Giải thích:</strong> ${q.explanation || 'Không có giải thích'}</p>
+                ${buildExplanationBoxHtml(q.explanation)}
             </div>
         `;
     });
  
     const percent = Math.round((correctCount / currentTestSession.questions.length) * 100);
     
-    // LẤY USER ID HOẶC DÙNG TẠM GUEST ĐỂ TEST
     const userIdToSave = CURRENT_USER_ID || "guest_test_user";
  
-    // GỬI LÊN FIREBASE (Collection: results)
     try {
         const docRef = await addDoc(collection(db, "results"), {
             userId: userIdToSave,
@@ -837,11 +769,11 @@ async function evaluateAndSaveTest() {
     document.getElementById('mistake-count').textContent = mistakes;
     document.getElementById('detailed-results').innerHTML = htmlDetails;
 
-    // [THÊM MỚI] Cập nhật vòng tròn điểm số (score-ring) theo % đạt được
+    renderResultReadingPassage();
+
     const ringEl = document.getElementById('score-ring');
     if (ringEl) ringEl.style.setProperty('--pct', percent);
 
-    // [THÊM MỚI] Đánh dấu bài này là "đã hoàn thành" ngay lập tức + làm mới banner lớp đang học
     completedExerciseIds.add(currentTestSession.id);
     loadMyClassSummary();
 
@@ -850,9 +782,127 @@ async function evaluateAndSaveTest() {
     document.getElementById('quiz-form').reset();
     window.scrollTo(0,0);
 }
-// Mở trang Thống kê kết quả tổng quan
+
+
+function normalizeExplanation(explanation) {
+    if (!explanation) return { quote: '', explanationVi: '' };
+    if (typeof explanation === 'string') return { quote: '', explanationVi: explanation };
+    return {
+        quote: (explanation.quote || '').trim(),
+        explanationVi: (explanation.explanationVi || '').trim(),
+    };
+}
+
+function buildExplanationBoxHtml(explanationRaw) {
+    const { quote, explanationVi } = normalizeExplanation(explanationRaw);
+    if (!quote && !explanationVi) return '';
+
+    const quoteHtml = quote ? `<p class="explanation-quote">📖 "${escapeHtml(quote)}"</p>` : '';
+    const textHtml = explanationVi ? `<p class="explanation-text">💡 <strong>Giải thích:</strong> ${escapeHtml(explanationVi)}</p>` : '';
+    const hintText = quote ? '👉🔊 Bấm để xem trong bài đọc & nghe đọc giải thích' : '🔊 Bấm để nghe đọc giải thích';
+
+    return `
+        <div class="explanation-box is-clickable" data-quote="${escapeHtml(quote)}" data-explanation-vi="${escapeHtml(explanationVi)}">
+            ${quoteHtml}
+            ${textHtml}
+            <p class="explanation-hint">${hintText}</p>
+        </div>
+    `;
+}
+
+function speakExplanation(quote, explanationVi) {
+    if (!('speechSynthesis' in window)) return;
+    try {
+        window.speechSynthesis.cancel(); // dừng đoạn đang đọc dở (nếu có) trước khi đọc câu mới
+        if (quote && quote.trim()) {
+            const uQuote = new SpeechSynthesisUtterance(quote.trim());
+            uQuote.lang = 'en-US';
+            uQuote.rate = 0.95;
+            window.speechSynthesis.speak(uQuote);
+        }
+        if (explanationVi && explanationVi.trim()) {
+            const uExp = new SpeechSynthesisUtterance(explanationVi.trim());
+            uExp.lang = 'vi-VN';
+            uExp.rate = 1;
+            window.speechSynthesis.speak(uExp);
+        }
+    } catch (e) {
+        console.error('Lỗi đọc giải thích (Web Speech API):', e);
+    }
+}
+let resultPassageRawText = '';
+
+function ensureResultPassageBox() {
+    let box = document.getElementById('result-passage-box');
+    if (box) return box;
+    const detailed = document.getElementById('detailed-results');
+    if (!detailed || !detailed.parentElement) return null;
+    box = document.createElement('div');
+    box.id = 'result-passage-box';
+    box.className = 'result-passage-box hidden';
+    detailed.parentElement.insertBefore(box, detailed);
+    return box;
+}
+
+function renderResultReadingPassage() {
+    const box = ensureResultPassageBox();
+    if (!box) return;
+    resultPassageRawText = (currentTestSession && currentTestSession.content) || '';
+    if (!resultPassageRawText.trim()) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+    }
+    box.classList.remove('hidden');
+    box.innerHTML = `
+        <h4 class="result-passage-title">📖 Bài đọc</h4>
+        <div id="result-passage-text" class="result-passage-text">${escapeHtml(resultPassageRawText)}</div>
+    `;
+}
+
+function flashElement(el) {
+    el.classList.add('quote-flash');
+    setTimeout(() => el.classList.remove('quote-flash'), 1600);
+}
+
+function scrollToAndHighlightQuote(quote) {
+    const textEl = document.getElementById('result-passage-text');
+    const cleanQuote = (quote || '').trim();
+    if (!textEl || !cleanQuote) return;
+
+    const rawText = resultPassageRawText;
+    let start = rawText.toLowerCase().indexOf(cleanQuote.toLowerCase());
+    let matchLen = cleanQuote.length;
+
+    if (start === -1) {
+        const collapse = (s) => s.replace(/\s+/g, ' ').toLowerCase();
+        const collapsedIdx = collapse(rawText).indexOf(collapse(cleanQuote));
+        if (collapsedIdx === -1) {
+            textEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            flashElement(textEl);
+            return;
+        }
+        start = collapsedIdx;
+    }
+
+    const before = rawText.slice(0, start);
+    const match = rawText.slice(start, start + matchLen);
+    const after = rawText.slice(start + matchLen);
+    textEl.innerHTML = `${escapeHtml(before)}<mark id="active-quote-highlight" class="quote-highlight">${escapeHtml(match)}</mark>${escapeHtml(after)}`;
+
+    document.getElementById('active-quote-highlight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+document.addEventListener('click', (e) => {
+    const box = e.target.closest('.explanation-box.is-clickable');
+    if (!box) return;
+    const quote = box.dataset.quote || '';
+    const explanationVi = box.dataset.explanationVi || '';
+    if (quote) scrollToAndHighlightQuote(quote); 
+    speakExplanation(quote, explanationVi);
+});
+
 window.showLearningStats = async function() {
-    // Ẩn các section khác, hiện section thống kê
     document.getElementById('class-selection-section').classList.add('hidden');
     document.getElementById('dashboard-section').classList.add('hidden');
     document.getElementById('test-section').classList.add('hidden');
@@ -865,10 +915,9 @@ window.showLearningStats = async function() {
     const historyList = document.getElementById('history-list');
     historyList.innerHTML = '<p style="text-align: center; color: #666;">Đang đồng bộ dữ liệu học tập từ hệ thống...</p>';
 
-    loadStatsProfileDetail(userIdToQuery); // [THÊM MỚI] hồ sơ chi tiết (port từ admin/profile) — chạy song song, không chặn phần dưới
+    loadStatsProfileDetail(userIdToQuery); 
  
     try {
-        // Truy vấn tất cả kết quả của user này trong bảng results
         const q = query(collection(db, "results"), where("userId", "==", userIdToQuery));
         const querySnapshot = await getDocs(q);
  
@@ -892,19 +941,16 @@ window.showLearningStats = async function() {
             totalScoreSum += (data.scorePercentage || 0);
             totalCorrect += (data.correctAnswers || 0);
         });
-
-        // [THÊM MỚI] Tra cứu tiêu đề + dữ liệu câu hỏi của từng bài tập (để hiển thị tên
-        // thật thay vì mã bài, và để có thể xem lại chi tiết từng câu khi bấm vào).
         const uniqueExerciseIds = [...new Set(resultsRaw.map((r) => r.exerciseId).filter(Boolean))];
         const exerciseMap = {};
         await Promise.all(uniqueExerciseIds.map(async (exId) => {
             try {
                 const exSnap = await getDoc(doc(db, 'exercises', exId));
                 if (exSnap.exists()) exerciseMap[exId] = { id: exSnap.id, ...exSnap.data() };
-            } catch (e) { /* bài có thể đã bị xóa khỏi hệ thống — bỏ qua */ }
+            } catch (e) {}
         }));
 
-        // [THÊM MỚI] Nhóm lịch sử làm bài theo NGÀY nộp bài (ví dụ: ngày 23, 22, 21...)
+    
         const dayGroups = groupByDay(resultsRaw, (r) => (r.timestamp?.toDate ? r.timestamp.toDate() : null));
         historyList.innerHTML = dayGroups.map((group) => `
             <div class="day-group">
@@ -913,15 +959,15 @@ window.showLearningStats = async function() {
             </div>
         `).join('');
 
-        // Bấm vào 1 lượt làm bài để mở/đóng xem chi tiết từng câu
+        
         historyList.querySelectorAll('.quiz-history-summary').forEach((btn) => {
             btn.addEventListener('click', () => btn.closest('.quiz-history-item').classList.toggle('is-open'));
         });
  
-        // Tính điểm trung bình
+        
         const avgScore = Math.round(totalScoreSum / totalTests);
  
-        // Đẩy số liệu thống kê lên giao diện
+        
         document.getElementById('total-tests').textContent = totalTests;
         document.getElementById('avg-score').textContent = avgScore + '%';
         document.getElementById('total-correct').textContent = totalCorrect;
@@ -932,10 +978,6 @@ window.showLearningStats = async function() {
     }
 }
 
-// [THÊM MỚI] Render 1 lượt làm bài trong lịch sử — dạng có thể bấm mở rộng để
-// xem lại chi tiết TỪNG CÂU (đúng/sai, đáp án đúng, giải thích) — tái sử dụng
-// đúng các class .result-item / .explanation-box / .text-green / .text-red đã
-// dùng ở khu vực "Kết quả" ngay sau khi nộp bài.
 function renderQuizHistoryItemHtml(r, exercise) {
     let dateStr = 'Gần đây';
     if (r.timestamp && typeof r.timestamp.toDate === 'function') {
@@ -955,7 +997,7 @@ function renderQuizHistoryItemHtml(r, exercise) {
                 <h4>Câu ${idx + 1}: ${escapeHtml(q.text || '')}</h4>
                 <p>Đáp án của bạn: <strong class="${isCorrect ? 'text-green' : 'text-red'}">${escapeHtml(userAnswer || '(Bỏ trống)')}</strong></p>
                 ${!isCorrect ? `<p>Đáp án đúng: <strong class="text-green">${escapeHtml(correctRaw)}</strong></p>` : ''}
-                ${q.explanation ? `<p class="explanation-box">💡 <strong>Giải thích:</strong> ${escapeHtml(q.explanation)}</p>` : ''}
+                ${buildExplanationBoxHtml(q.explanation)}
             </div>`;
         }).join('');
     }
@@ -977,17 +1019,12 @@ function renderQuizHistoryItemHtml(r, exercise) {
     </div>`;
 }
 
-// ============================================================
-// [THÊM MỚI] HỒ SƠ CHI TIẾT (port từ "Hồ sơ chi tiết học viên" bên admin.js /
-// profile.js) — thông tin cá nhân, điểm số tổng hợp, xếp hạng trong lớp, và
-// nhật ký buổi học do giáo viên đánh giá, hiển thị ngay trong trang lớp học.
-// ============================================================
 async function loadStatsProfileDetail(uid) {
     const wrap = document.getElementById('stats-profile-detail');
     if (!wrap) return;
 
     if (!CURRENT_USER_ID) {
-        wrap.classList.add('hidden'); // khách chưa đăng nhập -> không có hồ sơ để hiển thị
+        wrap.classList.add('hidden'); 
         return;
     }
     wrap.classList.remove('hidden');
@@ -1006,13 +1043,13 @@ async function loadStatsProfileDetail(uid) {
     try {
         const snap = await getDoc(doc(db, 'students', uid));
         if (!snap.exists()) {
-            wrap.classList.add('hidden'); // chưa có hồ sơ học viên (VD: chỉ mới đăng ký tài khoản, chưa được admin khởi tạo)
+            wrap.classList.add('hidden'); 
             return;
         }
         const student = { id: snap.id, ...snap.data() };
         if (!student.scores) student.scores = { testScoreAvg: 0, teacherEvalAvg: 0, bonusPoints: 0, participationPoints: 0 };
 
-        // Thông tin cá nhân
+    
         infoList.innerHTML = STATS_INFO_FIELDS.map((f) => {
             const raw = student[f.key];
             let value;
@@ -1022,7 +1059,7 @@ async function loadStatsProfileDetail(uid) {
             return `<div><dt>${f.label}</dt><dd>${value}</dd></div>`;
         }).join('');
 
-        // Điểm số tổng hợp
+        
         const scores = student.scores;
         const metrics = [
             { label: 'Điểm kiểm tra trung bình', display: `${round1(scores.testScoreAvg)}/100`, barPct: clampPct(scores.testScoreAvg, 100), cls: '' },
@@ -1038,7 +1075,6 @@ async function loadStatsProfileDetail(uid) {
         `).join('');
         compositeEl.textContent = computeCompositeScore(scores);
 
-        // Xếp hạng trong lớp
         if (!student.classId) {
             rankBadge.textContent = '🎯 Chưa xếp lớp';
         } else {
@@ -1057,7 +1093,6 @@ async function loadStatsProfileDetail(uid) {
             }
         }
 
-        // Nhật ký buổi học do giáo viên đánh giá — nhóm theo ngày
         try {
             const sessSnap = await getDocs(query(collection(db, 'students', student.id, 'sessions'), orderBy('date', 'desc')));
             const sessions = [];
@@ -1079,7 +1114,7 @@ function renderStatsSessionsList(sessions) {
         list.innerHTML = '<p class="empty-state">Chưa có buổi học nào được giáo viên ghi nhận.</p>';
         return;
     }
-    // Nhóm theo ngày (ngày 23, 22, 21...) — đồng nhất với lịch sử làm bài & danh sách bài tập
+
     const groups = groupByDay(sessions, (s) => (s.date ? new Date(s.date) : null));
     list.innerHTML = groups.map((group) => `
         <div class="day-group">
@@ -1109,16 +1144,14 @@ function renderSessionItemHtml(s) {
     </div>`;
 }
  
-// Nút quay lại từ trang thống kê
 window.goBackFromStats = function() {
     document.getElementById('learning-stats-section').classList.add('hidden');
     document.getElementById('class-selection-section').classList.remove('hidden');
 }
-// Hàm cập nhật thống kê trên trang chủ
 async function loadDashboardStats() {
     const userId = CURRENT_USER_ID || "guest_test_user";
     
-    // Các phần tử HTML vừa thêm
+
     const totalTestsEl = document.getElementById('stat-total-tests');
     const avgScoreEl = document.getElementById('stat-avg-score');
     const totalCorrectEl = document.getElementById('stat-total-correct');
@@ -1138,7 +1171,6 @@ async function loadDashboardStats() {
             totalCorrect += (data.correctAnswers || 0);
         });
  
-        // Cập nhật giao diện
         if (totalTests > 0) {
             totalTestsEl.textContent = totalTests;
             avgScoreEl.textContent = Math.round(totalScoreSum / totalTests) + '%';

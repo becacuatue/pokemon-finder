@@ -1,4 +1,4 @@
-// Import Firebase SDK (ES Module)
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
     getAuth, 
@@ -9,12 +9,9 @@ import {
 import { 
     getFirestore, 
     doc, 
-    setDoc 
+    setDoc ,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// ==============================================
-// 1. CẤU HÌNH FIREBASE (Điền config của bạn vào đây)
-// ==============================================
 const firebaseConfig = {
   apiKey: "AIzaSyCCfo_YmY770dFXA13Z7RS-xk1Satm-FEY",
   authDomain: "dtedu-1ca9f.firebaseapp.com",
@@ -31,10 +28,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 document.addEventListener('DOMContentLoaded', () => {
-
-    // ==============================================
-    // 2. DOM ELEMENTS (Khớp 100% với HTML của bạn)
-    // ==============================================
     const modal = document.getElementById('auth-modal');
     const btnCloseModal = document.querySelector('.close-modal');
     const tabLogin = document.getElementById('tab-login');
@@ -192,10 +185,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==============================================
     onAuthStateChanged(auth, (user) => {
         const loginNavBtn = document.querySelector('.login-link');
-        if (user && loginNavBtn) {
+        const testButton = document.getElementById('testTrail');
+        const userChip = document.getElementById('nav-user-chip');
+        if (user && loginNavBtn && testButton) {
             loginNavBtn.innerText = "Vào lớp học";
             loginNavBtn.removeAttribute('onclick');
             loginNavBtn.href = "classroom.html";
+            testButton.classList.add('hiddens');
+            testButton.classList.remove('btn');
+        }else{
+            userChip.classList.remove('nav-user-chip');
+            userChip.classList.add('hiddens');
+            
         }
     });
 
@@ -217,3 +218,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+document.addEventListener('DOMContentLoaded', () => {
+    onAuthStateChanged(auth, async (user) => {
+        const snap = await getDoc(doc(db, 'students', user.uid));
+        if (!snap.exists()) {
+            showView('profile-missing-section');
+            return;
+        }
+        const student = { id: snap.id, ...snap.data() };
+        if (!student.scores) student.scores = { testScoreAvg: 0, teacherEvalAvg: 0, bonusPoints: 0, participationPoints: 0 };
+        renderStudentInfo(student);
+    });
+
+});
+function getInitials(text) {
+    if (!text) return '?';
+    const clean = text.trim();
+    if (clean.includes('@')) return clean.charAt(0).toUpperCase();
+    const parts = clean.split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '?';
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+}
+function renderStudentInfo(student) {
+    const nameEl = document.getElementById('student-name');
+    const avatarEl = document.getElementById('student-avatar');
+    const navChip = document.getElementById('nav-user-chip');
+    const navAvatar = document.getElementById('nav-avatar-sm');
+    const navName = document.getElementById('nav-user-name');
+    const dropdownName = document.getElementById('dropdown-name');
+    const dropdownEmail = document.getElementById('dropdown-email');
+    const dropdownUid = document.getElementById('dropdown-uid');
+    const dropdownAvatar = document.getElementById('dropdown-avatar');
+    const displayName = student ? (student.fullName || student.email || 'Học viên') : 'Khách';
+    const initials = student ? getInitials(student.fullName ||student.email) : '🎓';
+    console.log(student.fullName)
+    if (nameEl) nameEl.textContent = displayName;
+    if (avatarEl && student) avatarEl.textContent = initials;
+ 
+    if (navChip && navName && navAvatar) {
+        if (student) {
+            navChip.classList.remove('hidden');
+            navAvatar.textContent = initials;
+            navName.textContent = displayName;
+            if (dropdownName) dropdownName.textContent = displayName;
+            if (dropdownEmail) dropdownEmail.textContent = student.email || 'Không có email';
+            if (dropdownUid) dropdownUid.textContent = student.uid;
+            if (dropdownAvatar) dropdownAvatar.textContent = initials;
+        } else {
+            navChip.classList.add('hidden');
+        }
+    }
+}

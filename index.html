@@ -9,8 +9,7 @@
     <link rel="shortcut icon" href="/favicon/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
-    <!-- Tích hợp Font Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,13 +20,17 @@
             <a href="#" class="logo">DT<span>Edu</span></a>
             <nav class="nav-links">
                 <a href="index.html">Trang chủ</a>
-                <a href="classroom.html">Lớp học</a>
+                <a href="#how-it-works">Cách hoạt động</a>
+                <a href="#teachers">Giáo viên</a>
                 <a onclick="openAuthModal('login')" class="login-link">Đăng nhập</a>
             </nav>
-            <a href="#register" class="btn btn-primary">Học thử ngay</a>
+                <a href="profile.html" class="nav-user-chip hidden" id="nav-user-chip" title="Xem hồ sơ cá nhân">
+                    <span class="avatar-sm" id="nav-avatar-sm">?</span>
+                    <span id="nav-user-name">Học viên</span>
+                </a>
+            <a href="#register" id="testTrail" class="btn btn-primary">Học thử ngay</a>
         </div>
     </header>
-    <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
     <div id="auth-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -35,8 +38,6 @@
                 <button id="tab-login" class="auth-tab active">Đăng nhập</button>
                 <button id="tab-register" class="auth-tab">Đăng ký</button>
             </div>
-
-            <!-- Form Đăng Nhập -->
             <form id="login-form" class="auth-form">
                 <div class="form-group">
                     <label>Email</label>
@@ -50,7 +51,6 @@
                 <button type="submit" class="btn btn-primary w-100">Đăng nhập vào lớp</button>
             </form>
 
-            <!-- Form Đăng Ký -->
             <form id="register-form" class="auth-form hidden">
                 <div class="form-group">
                     <label>Họ và tên</label>
@@ -70,13 +70,12 @@
         </div>
     </div>
 
-    <!-- Hero Section -->
     <section id="hero" class="hero">
         <div class="container hero-content">
             <div class="hero-text">
                 <span class="badge">Nền tảng học trực tuyến thế hệ mới</span>
                 <h1>Học Tiếng Anh Được <span>Thiết Kế Riêng</span> Cho Bạn</h1>
-                <p>Khám phá hệ thống học tập thông minh với các bài tập được cá nhân hóa 100%. Đánh giá toàn diện mọi kỹ năng của bạn sau từng phút học tập.</p>
+                <p>Mỗi lớp có giáo viên phụ trách riêng, bài tập được nhóm theo từng ngày học. Làm bài xong là biết điểm ngay, kèm giải thích chi tiết cho từng câu.</p>
                 <div class="hero-buttons">
                     <a href="#register" class="btn btn-primary">Bắt đầu lộ trình</a>
                     <a href="#features" class="btn btn-outline">Tìm hiểu thêm</a>
@@ -89,8 +88,6 @@
                     <img src="photo-3-17153126485401360823109.jpg" alt="Gallery Image 2">
                     <img src="Hinh-anh-mot-goc-trung-tam-DOL-English-1024x576.png" alt="Gallery Image 3">
                     <img src="photo-1-17156573288831969948291.jpg" alt="Gallery Image 4">
-
-                    <!-- CSS Nội bộ chỉ áp dụng cho component này -->
                     <style>
                         .image-placeholder {
                             width: 100%;
@@ -216,47 +213,187 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
+    <!-- Cách hệ thống hoạt động -->
+    <section id="how-it-works" class="how-it-works">
         <div class="container">
             <div class="section-title">
-                <h2>Tại sao chọn DTEdu English?</h2>
-                <p>Hệ thống công nghệ giáo dục độc quyền giúp tối ưu hóa thời gian và năng lực của từng học viên.</p>
+                <h2>Hệ thống DTEdu hoạt động như thế nào?</h2>
+                <p>Từ lúc chọn lớp đến lúc biết điểm — toàn bộ quy trình một học viên sẽ trải qua khi vào học trên DTEdu.</p>
             </div>
-            
-            <div class="features-grid">
-                <!-- Feature 1 -->
-                <div class="feature-card">
-                    <div class="icon"></div>
-                    <h3>Hệ Thống Bài Tập Cá Nhân Hóa</h3>
-                    <p>Không có hai lộ trình giống nhau. AI tự động phân tích điểm mạnh, điểm yếu của bạn để đề xuất độ khó và chủ đề bài tập phù hợp nhất ở từng thời điểm.</p>
-                </div>
 
-                <!-- Feature 2 -->
-                <div class="feature-card">
-                    <div class="icon"></div>
-                    <h3>Đánh Giá Chỉ Số Toàn Diện</h3>
-                    <p>Báo cáo chi tiết sau mỗi bài học. Theo dõi sát sao các chỉ số về: Từ vựng, Ngữ pháp, Độ trôi chảy và Độ chính xác của phát âm bằng biểu đồ trực quan.</p>
+            <div class="steps-flow">
+                <div class="step">
+                    <div class="step-marker">1</div>
+                    <div class="step-body">
+                        <h3>Chọn lớp học</h3>
+                        <p>Xem danh sách các lớp đang mở. Mỗi lớp hiển thị rõ giáo viên phụ trách, và bài tập bên trong được nhóm theo từng ngày học để dễ theo dõi.</p>
+                    </div>
                 </div>
-
-                <!-- Feature 3 -->
-                <div class="feature-card">
-                    <div class="icon"></div>
-                    <h3>Giao Diện Thân Thiện & Đẹp Mắt</h3>
-                    <p>Trải nghiệm học tập không áp lực với tone màu mát mẻ, thiết kế hiện đại, tập trung cao độ, dễ dàng thao tác trên mọi thiết bị.</p>
+                <div class="step">
+                    <div class="step-marker">2</div>
+                    <div class="step-body">
+                        <h3>Khởi động từ vựng (nếu bài có)</h3>
+                        <p>Trước một số bài, hệ thống cho nghe phát âm chuẩn rồi chọn nghĩa đúng trong 4 đáp án để làm nóng trước. Không muốn ôn trước thì bấm "Bỏ qua" để vào thẳng bài làm.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-marker">3</div>
+                    <div class="step-body">
+                        <h3>Làm bài với giao diện tách đôi</h3>
+                        <p>Bài đọc hoặc bài nghe ở bên trái, câu hỏi ở bên phải, có đồng hồ đếm ngược theo đúng thời gian quy định của bài. Hết giờ, hệ thống tự động nộp bài giúp bạn.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-marker">4</div>
+                    <div class="step-body">
+                        <h3>Xem điểm và giải thích ngay lập tức</h3>
+                        <p>Nộp bài xong là có điểm theo %, xem đúng/sai từng câu. Bấm vào phần giải thích, hệ thống tự cuộn tới đúng đoạn trong bài đọc, tô đỏ để bạn đối chiếu, và đọc to lại bằng giọng nói.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-marker">5</div>
+                    <div class="step-body">
+                        <h3>Theo dõi tiến độ & nhận xét của giáo viên</h3>
+                        <p>Điểm tổng hợp gồm cả điểm bài kiểm tra lẫn đánh giá của giáo viên qua từng buổi học, cộng thêm xếp hạng trong lớp và lịch sử làm bài xem lại được bất cứ lúc nào.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Call to action Section -->
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Những gì bạn thực sự nhận được</h2>
+                <p>Không phải lời quảng cáo chung chung — đây là các cơ chế đang chạy thật trên lớp học của DTEdu.</p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="icon">🔤</div>
+                    <h3>Khởi Động Từ Vựng Trước Khi Vào Bài</h3>
+                    <p>Nghe phát âm chuẩn (chọn giọng Mỹ hoặc Anh), chọn đúng nghĩa trong 4 đáp án. Hệ thống ghi lại điểm, chuỗi đúng liên tiếp và độ chính xác ngay trong lúc luyện.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="icon">📖</div>
+                    <h3>Giải Thích Bằng Trích Dẫn Thật</h3>
+                    <p>Sai câu nào, bấm vào là hệ thống cuộn thẳng tới đúng đoạn trong bài đọc, tô đỏ để đối chiếu, kèm giải thích tiếng Việt và đọc to lại bằng giọng nói.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="icon">👩‍🏫</div>
+                    <h3>Điểm Số Gắn Liền Với Giáo Viên Thật</h3>
+                    <p>Điểm tổng hợp không chỉ tính từ bài kiểm tra, mà còn cộng cả đánh giá và nhận xét của giáo viên phụ trách qua từng buổi học.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h3>Tiến Độ &amp; Xếp Hạng Rõ Ràng</h3>
+                    <p>Biết ngay mình đã làm bao nhiêu bài trong lớp, điểm trung bình, đang xếp hạng bao nhiêu, và xem lại lịch sử làm bài theo từng ngày.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Đội ngũ giáo viên -->
+    <section id="teachers" class="teachers">
+        <div class="container">
+            <div class="section-title">
+                <h2>Đội ngũ giáo viên</h2>
+                <p>Gặp gỡ những người đồng hành cùng bạn trên lộ trình chinh phục tiếng Anh.</p>
+            </div>
+
+            <!--
+                ✏️ ĐIỀN THÔNG TIN GIÁO VIÊN THẬT CỦA BẠN VÀO CÁC Ô BÊN DƯỚI:
+                - Đổi "Tên giáo viên" thành tên thật.
+                - Đổi "Chức danh / chuyên môn" thành chức danh (VD: Giáo viên IELTS, Giáo viên Giao tiếp...).
+                - Trong .teacher-tags: đổi 2 thẻ nhỏ thành điểm số/chứng chỉ và số năm kinh nghiệm.
+                - Đổi đoạn .teacher-bio thành mô tả ngắn (2-3 câu) về kinh nghiệm, phong cách dạy.
+                - Nếu có ảnh thật: xóa thẻ <span>GV</span> và thêm
+                  <img src="duong-dan-anh.jpg" alt="Tên giáo viên"> vào trong .teacher-avatar.
+                - Muốn thêm/bớt giáo viên: sao chép hoặc xóa cả khối <div class="teacher-card">...</div>.
+            -->
+            <div class="teacher-grid">
+                <div class="teacher-card">
+                    <div class="teacher-avatar">
+                        <span>GV</span>
+                    </div>
+                    <h3 class="teacher-name">Tên giáo viên</h3>
+                    <p class="teacher-title">Chức danh / chuyên môn</p>
+                    <div class="teacher-tags">
+                        <span class="teacher-tag">Điểm IELTS / chứng chỉ</span>
+                        <span class="teacher-tag">Số năm kinh nghiệm</span>
+                    </div>
+                    <p class="teacher-bio">Mô tả ngắn về kinh nghiệm giảng dạy, phong cách dạy và thành tích nổi bật của giáo viên...</p>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-avatar">
+                        <span>GV</span>
+                    </div>
+                    <h3 class="teacher-name">Tên giáo viên</h3>
+                    <p class="teacher-title">Chức danh / chuyên môn</p>
+                    <div class="teacher-tags">
+                        <span class="teacher-tag">Điểm IELTS / chứng chỉ</span>
+                        <span class="teacher-tag">Số năm kinh nghiệm</span>
+                    </div>
+                    <p class="teacher-bio">Mô tả ngắn về kinh nghiệm giảng dạy, phong cách dạy và thành tích nổi bật của giáo viên...</p>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-avatar">
+                        <span>GV</span>
+                    </div>
+                    <h3 class="teacher-name">Tên giáo viên</h3>
+                    <p class="teacher-title">Chức danh / chuyên môn</p>
+                    <div class="teacher-tags">
+                        <span class="teacher-tag">Điểm IELTS / chứng chỉ</span>
+                        <span class="teacher-tag">Số năm kinh nghiệm</span>
+                    </div>
+                    <p class="teacher-bio">Mô tả ngắn về kinh nghiệm giảng dạy, phong cách dạy và thành tích nổi bật của giáo viên...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Học thử — đích đến của nút "Học thử ngay" trên navbar -->
     <section id="register" class="cta-section">
         <div class="container cta-content">
-            <h2>Sẵn sàng nâng trình Tiếng Anh của bạn?</h2>
-            <p>Tham gia cùng hàng ngàn học viên khác và trải nghiệm hệ thống học tập được may đo cho riêng bạn.</p>
+            <h2>Học thử miễn phí — không cần tạo tài khoản</h2>
+            <p>Bấm vào là vào thẳng lớp học thật, làm bài y hệt học viên chính thức: từ khởi động từ vựng, làm bài có giờ, đến xem điểm và giải thích ngay sau khi nộp.</p>
+
+            <div class="trial-highlights">
+                <div class="trial-highlight">
+                    <span class="trial-icon">🔓</span>
+                    <strong>Không cần đăng ký</strong>
+                    <p>Chọn một lớp học thử và làm bài ngay, không cần tạo tài khoản trước.</p>
+                </div>
+                <div class="trial-highlight">
+                    <span class="trial-icon">🖥️</span>
+                    <strong>Giao diện y hệt lớp thật</strong>
+                    <p>Cùng giao diện tách đôi bài đọc - câu hỏi, cùng đồng hồ đếm giờ như học viên chính thức.</p>
+                </div>
+                <div class="trial-highlight">
+                    <span class="trial-icon">⚡</span>
+                    <strong>Biết kết quả ngay</strong>
+                    <p>Nộp bài là có điểm, có giải thích từng câu ngay lập tức, không phải chờ đợi.</p>
+                </div>
+            </div>
+
+            <div class="cta-buttons">
+                <a href="classroom.html#class-selection-section" class="btn btn-dark">Vào học thử ngay →</a>
+            </div>
+
+            <p class="cta-divider">Hoặc để lại email, đội ngũ DTEdu sẽ tư vấn lộ trình phù hợp cho bạn</p>
             <form class="cta-form">
                 <input type="email" placeholder="Nhập email của bạn..." required>
-                <button type="submit" class="btn btn-dark">Nhận tư vấn miễn phí</button>
+                <button type="submit" class="btn btn-outline btn-on-primary">Nhận tư vấn miễn phí</button>
             </form>
         </div>
     </section>
@@ -273,7 +410,7 @@
                 <h4>Về chúng tôi</h4>
                 <ul>
                     <li><a href="#">Giới thiệu</a></li>
-                    <li><a href="#">Đội ngũ giáo viên</a></li>
+                    <li><a href="#teachers">Đội ngũ giáo viên</a></li>
                     <li><a href="#">Tuyển dụng</a></li>
                     <li><a href="#">Blog học thuật</a></li>
                 </ul>
@@ -297,7 +434,7 @@
             </div>
         </div>
         <div class="footer-bottom container">
-            <p>&copy; 2026 Matcha English. Đã đăng ký bản quyền.</p>
+            <p>&copy; 2026 DTEdu English. Đã đăng ký bản quyền.</p>
         </div>
     </footer>
     <script type="module" src="auth.js"></script>

@@ -6,6 +6,8 @@
     <title>Hồ sơ của tôi · DTEdu</title>
     <link rel="stylesheet" href="classroom.css">
     <link rel="stylesheet" href="profile.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -16,7 +18,7 @@
             <nav class="nav-links">
                 <a href="index.html">Trang chủ</a>
                 <a href="classroom.html">Lớp học</a>
-                <a href="classroom.html">Kết quả học tập</a>
+                <a href="profile.html">Kết quả học tập</a>
             </nav>
             <div class="nav-right">
                 <!-- Chip học viên (được profile.js cập nhật) -->
@@ -61,14 +63,17 @@
             <div class="profile-avatar-wrap">
                 <img id="profile-avatar-img" class="profile-avatar hidden" src="" alt="Ảnh đại diện">
                 <div id="profile-avatar-fallback" class="profile-avatar">?</div>
-            </div>
             <div class="profile-header-info">
                 <div class="profile-rank-badge" id="profile-rank-badge">Đang tính hạng...</div>
                 <h2 id="profile-student-name">--</h2>
                 <p class="profile-code">Mã học viên: <strong id="profile-student-code">------</strong> · Lớp: <span id="profile-student-class">--</span></p>
             </div>
         </div>
-
+        <div style="flex: 2; padding: 20px; background: var(--surface-tint); border-radius: var(--radius-m); border: 1px solid var(--border-color);">
+            <h3>Xu hướng điểm số</h3>
+            <canvas id="scoreChart" width="200" height="125" style></canvas>
+        </div>
+            </div>
         <div class="profile-grid">
             <div class="profile-info-card">
                 <h3>👤 Thông tin cá nhân</h3>
@@ -85,20 +90,18 @@
         </div>
 
         <div class="sessions-section">
+        <div class="history-panel" style="margin-top:30px;">
+            <h3>Lịch sử làm bài kiểm tra (nhóm theo ngày, bấm vào để xem chi tiết từng câu)</h3>
+            <button id="open" class="detailed-results-container-open"><span class="qh-chevron">Mở Rộng</span></button>
+            <div id="profile-quiz-history" class="detailed-results-container"></div>
+
+        </div>
             <div class="section-heading">
-                <h3>🗓 Nhận xét của giáo viên qua từng buổi học</h3>
+                <h3> Nhận xét của giáo viên qua từng buổi học</h3>
             </div>
             <div id="profile-sessions-list" class="sessions-list"></div>
         </div>
 
-        <!-- ================= [THÊM MỚI] LỊCH SỬ LÀM BÀI KIỂM TRA CHI TIẾT =================
-             Trước đây trang này chỉ có 1 con số "điểm kiểm tra trung bình" — giờ hiện
-             luôn danh sách từng lượt làm bài, nhóm theo ngày, bấm vào để xem lại chi
-             tiết từng câu (tái sử dụng đúng css/cơ chế .quiz-history-item bên classroom.css). -->
-        <div class="history-panel" style="margin-top:30px;">
-            <h3>📝 Lịch sử làm bài kiểm tra (nhóm theo ngày, bấm vào để xem chi tiết từng câu)</h3>
-            <div id="profile-quiz-history" class="detailed-results-container"></div>
-        </div>
     </section>
 
     <footer class="site-footer">
