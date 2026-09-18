@@ -640,7 +640,7 @@ function speakLessonVocabWord(text) {
     try {
         window.speechSynthesis.cancel();
         const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'en-US';
+        msg.lang = 'en-GB';
         msg.rate = 0.92;
         window.speechSynthesis.speak(msg);
     } catch (e) {
@@ -833,7 +833,7 @@ function speakExplanation(quote, explanationVi) {
         window.speechSynthesis.cancel(); 
         if (quote && quote.trim()) {
             const uQuote = new SpeechSynthesisUtterance(quote.trim());
-            uQuote.lang = 'en-US';
+            uQuote.lang = 'en-GB';
             uQuote.rate = 1.1;
             window.speechSynthesis.speak(uQuote);
         }
