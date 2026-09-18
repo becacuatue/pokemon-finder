@@ -20,8 +20,6 @@
             <a href="#" class="logo">DT<span>Edu</span></a>
             <nav class="nav-links">
                 <a href="index.html">Trang chủ</a>
-                <a href="#how-it-works">Cách hoạt động</a>
-                <a href="#teachers">Giáo viên</a>
                 <a onclick="openAuthModal('login')" class="login-link">Đăng nhập</a>
             </nav>
                 <a href="profile.html" class="nav-user-chip hidden" id="nav-user-chip" title="Xem hồ sơ cá nhân">
@@ -83,7 +81,6 @@
             </div>
             <div class="hero-image">
                 <div class="image-placeholder">
-                    <!-- Danh sách các ảnh trong gallery -->
                     <img src="Gemini_Generated_Image_pqvu6vpqvu6vpqvu.png" class="active" alt="Gallery Image 1">
                     <img src="photo-3-17153126485401360823109.jpg" alt="Gallery Image 2">
                     <img src="Hinh-anh-mot-goc-trung-tam-DOL-English-1024x576.png" alt="Gallery Image 3">
@@ -101,13 +98,13 @@
                             font-weight: 500;
                             box-shadow: var(--shadow, 0 10px 30px rgba(0,0,0,0.1));
                             position: relative;
-                            overflow: hidden; /* Bắt buộc để ẩn các ảnh nằm ngoài khung */
+                            overflow: hidden; 
                             cursor: pointer;
 
                             img {
                                 width: 100%;
                                 height: 100%;
-                                object-fit: cover; /* Giúp ảnh không bị biến dạng */
+                                object-fit: cover; 
                                 position: absolute;
                                 top: 0;
                                 left: 0;
@@ -119,7 +116,7 @@
                                             filter 0.8s cubic-bezier(0.4, 0, 0.2, 1);
                                 z-index: 1;
 
-                                /* Ảnh đang hiển thị chính */
+                           
                                 &.active {
                                     opacity: 1;
                                     transform: scale(1) translateY(0);
@@ -127,7 +124,7 @@
                                     z-index: 3;
                                 }
 
-                                /* Ảnh cũ bị ẩn xuống */
+                        
                                 &.exit {
                                     opacity: 0;
                                     transform: scale(0.95) translateY(40px);
@@ -138,17 +135,17 @@
                         }
                     </style>
 
-                    <!-- JavaScript xử lý chuyển ảnh & tương tác chuột -->
+            
                     <script>
                         (function() {
-                            // Lấy ra slider gần nhất chứa script này
+    
                             const container = document.currentScript.parentElement;
                             const images = container.querySelectorAll('img');
                             if (images.length <= 1) return;
 
                             let currentIndex = 0;
-                            let normalInterval = 3500; // Tốc độ bình thường (3.5 giây/ảnh)
-                            let fastInterval = 1200;   // Tốc độ nhanh khi di chuột (1.2 giây/ảnh)
+                            let normalInterval = 3500; 
+                            let fastInterval = 1200;   
                             let slideTimer = null;
                             let resetSpeedTimeout = null;
                             let isFastMode = false;
@@ -157,25 +154,24 @@
                             function nextSlide() {
                                 const currentImg = images[currentIndex];
                                 
-                                // Cập nhật chỉ số ảnh tiếp theo
+                        
                                 currentIndex = (currentIndex + 1) % images.length;
                                 const nextImg = images[currentIndex];
 
-                                // Đặt trạng thái thoát cho ảnh cũ
+                              
                                 currentImg.classList.remove('active');
                                 currentImg.classList.add('exit');
 
-                                // Đưa ảnh mới vào
+                                
                                 nextImg.classList.remove('exit');
                                 nextImg.classList.add('active');
 
-                                // Dọn dẹp class exit sau khi hoàn tất transition
+
                                 setTimeout(() => {
                                     currentImg.classList.remove('exit');
                                 }, 800);
                             }
 
-                            // Bắt đầu vòng lặp chuyển ảnh
                             function startTimer(interval) {
                                 stopTimer();
                                 slideTimer = setInterval(nextSlide, interval);
@@ -185,26 +181,25 @@
                                 if (slideTimer) clearInterval(slideTimer);
                             }
 
-                            // Khởi chạy slider ban đầu
+
                             startTimer(normalInterval);
 
-                            // Sự kiện RÊ CHUỘT VÀO: Chạy nhanh hơn ngay lập tức
+
                             container.addEventListener('mouseenter', () => {
                                 if (!isFastMode) {
                                     isFastMode = true;
                                     clearTimeout(resetSpeedTimeout);
-                                    nextSlide(); // Chuyển ngay 1 ảnh cho nhạy
+                                    nextSlide(); 
                                     startTimer(fastInterval);
                                 }
                             });
 
-                            // Sự kiện RỜI CHUỘT: Chờ 1 giây rồi chậm lại như cũ
                             container.addEventListener('mouseleave', () => {
                                 clearTimeout(resetSpeedTimeout);
                                 resetSpeedTimeout = setTimeout(() => {
                                     isFastMode = false;
                                     startTimer(normalInterval);
-                                }, 1000); // Đợi đúng 1s sau khi rời chuột mới chạy chậm lại
+                                }, 1000); 
                             });
                         })();
                     </script>
@@ -261,7 +256,6 @@
         </div>
     </section>
 
-    <!-- Features Section -->
     <section id="features" class="features">
         <div class="container">
             <div class="section-title">
@@ -308,61 +302,23 @@
                 <h2>Đội ngũ giáo viên</h2>
                 <p>Gặp gỡ những người đồng hành cùng bạn trên lộ trình chinh phục tiếng Anh.</p>
             </div>
-
-            <!--
-                ✏️ ĐIỀN THÔNG TIN GIÁO VIÊN THẬT CỦA BẠN VÀO CÁC Ô BÊN DƯỚI:
-                - Đổi "Tên giáo viên" thành tên thật.
-                - Đổi "Chức danh / chuyên môn" thành chức danh (VD: Giáo viên IELTS, Giáo viên Giao tiếp...).
-                - Trong .teacher-tags: đổi 2 thẻ nhỏ thành điểm số/chứng chỉ và số năm kinh nghiệm.
-                - Đổi đoạn .teacher-bio thành mô tả ngắn (2-3 câu) về kinh nghiệm, phong cách dạy.
-                - Nếu có ảnh thật: xóa thẻ <span>GV</span> và thêm
-                  <img src="duong-dan-anh.jpg" alt="Tên giáo viên"> vào trong .teacher-avatar.
-                - Muốn thêm/bớt giáo viên: sao chép hoặc xóa cả khối <div class="teacher-card">...</div>.
-            -->
             <div class="teacher-grid">
                 <div class="teacher-card">
                     <div class="teacher-avatar">
                         <span>GV</span>
                     </div>
-                    <h3 class="teacher-name">Tên giáo viên</h3>
-                    <p class="teacher-title">Chức danh / chuyên môn</p>
+                    <h3 class="teacher-name">Hoàng Đức Tuệ</h3>
+                    <p class="teacher-title">Founder</p>
                     <div class="teacher-tags">
-                        <span class="teacher-tag">Điểm IELTS / chứng chỉ</span>
-                        <span class="teacher-tag">Số năm kinh nghiệm</span>
+                        <span class="teacher-tag">Điểm IELTS / 7.5</span>
+                        <span class="teacher-tag">3 năm kinh nghiệm</span>
                     </div>
-                    <p class="teacher-bio">Mô tả ngắn về kinh nghiệm giảng dạy, phong cách dạy và thành tích nổi bật của giáo viên...</p>
-                </div>
-
-                <div class="teacher-card">
-                    <div class="teacher-avatar">
-                        <span>GV</span>
-                    </div>
-                    <h3 class="teacher-name">Tên giáo viên</h3>
-                    <p class="teacher-title">Chức danh / chuyên môn</p>
-                    <div class="teacher-tags">
-                        <span class="teacher-tag">Điểm IELTS / chứng chỉ</span>
-                        <span class="teacher-tag">Số năm kinh nghiệm</span>
-                    </div>
-                    <p class="teacher-bio">Mô tả ngắn về kinh nghiệm giảng dạy, phong cách dạy và thành tích nổi bật của giáo viên...</p>
-                </div>
-
-                <div class="teacher-card">
-                    <div class="teacher-avatar">
-                        <span>GV</span>
-                    </div>
-                    <h3 class="teacher-name">Tên giáo viên</h3>
-                    <p class="teacher-title">Chức danh / chuyên môn</p>
-                    <div class="teacher-tags">
-                        <span class="teacher-tag">Điểm IELTS / chứng chỉ</span>
-                        <span class="teacher-tag">Số năm kinh nghiệm</span>
-                    </div>
-                    <p class="teacher-bio">Mô tả ngắn về kinh nghiệm giảng dạy, phong cách dạy và thành tích nổi bật của giáo viên...</p>
+                    <p class="teacher-bio">Từng trải qua một quá trình dài kiên trì tự học và rèn luyện để đạt được số điểm IELTS 7.5, tôi thấu hiểu sâu sắc những khó khăn mà người học tiếng Anh thường gặp phải. Đối với tôi, việc học ngôn ngữ không nên chỉ dừng lại ở lý thuyết suông.    Triết lý của tôi là "Thực hành thực chiến – Bám sát tiến độ". Tôi xây dựng lộ trình học trong đó bài tập thực hành và sự hướng dẫn của giáo viên được gắn kết cực kỳ chặt chẽ. Học viên không chỉ được giao bài mà còn được theo dõi, phân tích lỗi sai và tinh chỉnh phương pháp liên tục để đảm bảo đầu ra tốt nhất.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Học thử — đích đến của nút "Học thử ngay" trên navbar -->
     <section id="register" class="cta-section">
         <div class="container cta-content">
             <h2>Học thử miễn phí — không cần tạo tài khoản</h2>

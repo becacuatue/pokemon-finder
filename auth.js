@@ -22,7 +22,7 @@ const firebaseConfig = {
   measurementId: "G-N6RZ88L6QQ"
 };
 
-// Khởi tạo Firebase
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -39,25 +39,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginError = document.getElementById('login-error');
     const regError = document.getElementById('reg-error');
 
-    // ==============================================
-    // 3. LOGIC BẬT / TẮT / CHUYỂN TAB MODAL
-    // ==============================================
-    
-    // Hàm mở Modal (gán vào window để HTML gọi onclick="openAuthModal('login')" không bị lỗi module)
+
     window.openAuthModal = function(tab = 'login') {
         if (!modal) return;
         modal.classList.remove('hidden');
         switchTab(tab);
     };
 
-    // Hàm đóng Modal
     function closeModal() {
         if (!modal) return;
         modal.classList.add('hidden');
         clearErrors();
     }
 
-    // Hàm chuyển Tab Đăng nhập / Đăng ký
     function switchTab(tab) {
         clearErrors();
         if (tab === 'login') {
@@ -78,19 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (regError) regError.innerText = '';
     }
 
-    // Sự kiện chuyển tab
     if (tabLogin) tabLogin.addEventListener('click', () => switchTab('login'));
     if (tabRegister) tabRegister.addEventListener('click', () => switchTab('register'));
-
-    // Đóng modal khi bấm nút X hoặc bấm ngoài vùng Modal
     if (btnCloseModal) btnCloseModal.addEventListener('click', closeModal);
     window.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });
 
-    // ==============================================
-    // 4. XỬ LÝ ĐĂNG NHẬP
-    // ==============================================
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -104,11 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.innerText = "Đang đăng nhập...";
                 submitBtn.disabled = true;
 
-                // Xử lý Auth với Firebase
+              
                 await signInWithEmailAndPassword(auth, email, password);
                 
                 closeModal();
-                window.location.href = "classroom.html"; // Đăng nhập thành công -> Chuyển sang lớp học
+                window.location.href = "classroom.html"; 
 
             } catch (error) {
                 console.error("Lỗi đăng nhập:", error);
@@ -119,10 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // ==============================================
-    // 5. XỬ LÝ ĐĂNG KÝ
-    // ==============================================
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -137,15 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.innerText = "Đang tạo tài khoản...";
                 submitBtn.disabled = true;
 
-                // 1. Tạo User Auth trên Firebase
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-
-                // 2. Tự động khởi tạo thông tin học viên trong Firestore DB để bên Admin nhìn thấy
-                // Khớp cấu trúc STUDENT_FIELDS và các chỉ số điểm/thông tin quản lý
                 await setDoc(doc(db, "students", user.uid), {
                     uid: user.uid,
-                    linkedAuthUid: user.uid, // Tự động liên kết UID để đồng bộ điểm kiểm tra sau này
+                    linkedAuthUid: user.uid, 
                     fullName: name,
                     email: email,
                     dob: "",
@@ -154,9 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     parentPhone: "",
                     address: "",
                     notes: "Tự động đăng ký từ hệ thống",
-                    classId: "", // Chưa xếp lớp cụ thể
+                    classId: "", 
                     className: "Chưa phân lớp",
-                    studentCode: String(Math.floor(100000 + Math.random() * 900000)), // Tạo mã học viên 6 số ngẫu nhiên
+                    studentCode: String(Math.floor(100000 + Math.random() * 900000)), 
                     photoUrl: "",
                     scores: {
                         testScoreAvg: 0,
@@ -169,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 closeModal();
-                window.location.href = "classroom.html"; // Đăng ký xong tự động đăng nhập & chuyển hướng
+                window.location.href = "classroom.html"; 
 
             } catch (error) {
                 console.error("Lỗi đăng ký:", error);
@@ -180,9 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    // ==============================================
-    // 6. GIỮ TRẠNG THÁI ĐĂNG NHẬP
-    // ==============================================
     onAuthStateChanged(auth, (user) => {
         const loginNavBtn = document.querySelector('.login-link');
         const testButton = document.getElementById('testTrail');
@@ -200,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Vietsub thông báo lỗi Firebase
     function getErrorMessage(code) {
         switch (code) {
             case 'auth/email-already-in-use':

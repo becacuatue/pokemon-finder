@@ -80,7 +80,6 @@ function groupByDay(items, dateGetter) {
 const LAST_CLASS_STORAGE_KEY = 'dtedu_current_class_name';
 
 async function loadClassesList() {
-   
     const classContainer = document.getElementById('classes-grid');
 
     try {
@@ -91,13 +90,33 @@ async function loadClassesList() {
             return;
         }
 
-        const classes = [];
+        let classes = [];
         querySnapshot.forEach((docSnap) => {
             classes.push({ id: docSnap.id, ...docSnap.data() });
         });
+
+        if (!CURRENT_USER_ID) {
+            classes = classes.filter((classData) => {
+                const className = (classData.name || '').toLowerCase();
+                
+                const isTrialClass = className.includes('học thử');
+                
+                const isGuestVisible = classData.isGuestVisible === true; 
+                
+                return isTrialClass || isGuestVisible;
+            });
+        }
+        // ==========================================
+
         classes.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'));
 
         classContainer.innerHTML = '';
+        
+        if (classes.length === 0) {
+            classContainer.innerHTML = '<p>Hiện tại chưa có lớp học thử nào. Vui lòng đăng nhập hoặc quay lại sau.</p>';
+            return;
+        }
+
         classes.forEach((classData) => {
             const card = document.createElement('div');
             card.className = 'card class-card';
@@ -283,7 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadRememberedClass(); 
     
     
-    loadClassesList();
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -291,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             console.log("Đang test chế độ chưa đăng nhập...");
         }
+        await loadClassesList();
         renderStudentInfo(user);
         await loadCompletedExerciseIds(); 
         loadDashboardStats();
@@ -756,13 +775,11 @@ async function evaluateAndSaveTest() {
         });
         console.log("🎉 Đã lưu kết quả thành công với ID:", docRef.id);
     } catch (error) {
-        console.error("Lỗi khi lưu kết quả lên Firebase:", error);
-        alert("⚠️ Không thể lưu điểm lên hệ thống. Lỗi: " + error.message);
     }
  
     submitBtn.textContent = originalBtnText;
     submitBtn.disabled = false;
-    isSubmittingTest = false; // [THÊM MỚI] reset cờ chống nộp trùng
+    isSubmittingTest = false; 
 
     // Hiển thị giao diện kết quả
     document.getElementById('score-display').textContent = `${percent}%`;
@@ -813,17 +830,17 @@ function buildExplanationBoxHtml(explanationRaw) {
 function speakExplanation(quote, explanationVi) {
     if (!('speechSynthesis' in window)) return;
     try {
-        window.speechSynthesis.cancel(); // dừng đoạn đang đọc dở (nếu có) trước khi đọc câu mới
+        window.speechSynthesis.cancel(); 
         if (quote && quote.trim()) {
             const uQuote = new SpeechSynthesisUtterance(quote.trim());
             uQuote.lang = 'en-US';
-            uQuote.rate = 0.95;
+            uQuote.rate = 1.1;
             window.speechSynthesis.speak(uQuote);
         }
         if (explanationVi && explanationVi.trim()) {
             const uExp = new SpeechSynthesisUtterance(explanationVi.trim());
             uExp.lang = 'vi-VN';
-            uExp.rate = 1;
+            uExp.rate = 1.5;
             window.speechSynthesis.speak(uExp);
         }
     } catch (e) {
@@ -856,7 +873,7 @@ function renderResultReadingPassage() {
     box.classList.remove('hidden');
     box.innerHTML = `
         <h4 class="result-passage-title">📖 Bài đọc</h4>
-        <div id="result-passage-text" class="result-passage-text">${escapeHtml(resultPassageRawText)}</div>
+        <div id="result-passage-text" class="result-passage-text" style="white-space: pre-line;">${escapeHtml(resultPassageRawText)}</div>
     `;
 }
 
