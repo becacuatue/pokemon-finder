@@ -81,7 +81,6 @@ const LAST_CLASS_STORAGE_KEY = 'dtedu_current_class_name';
 
 async function loadClassesList() {
     const classContainer = document.getElementById('classes-grid');
-
     try {
         const querySnapshot = await getDocs(collection(db, "classes"));
 
@@ -105,6 +104,8 @@ async function loadClassesList() {
                 
                 return isTrialClass || isGuestVisible;
             });
+        }else{
+            classContainer.classList.add('hidden');
         }
         // ==========================================
 
@@ -310,10 +311,11 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Đang test chế độ chưa đăng nhập...");
         }
         await loadClassesList();
+        loadMyClassSummary();
         renderStudentInfo(user);
         await loadCompletedExerciseIds(); 
         loadDashboardStats();
-        loadMyClassSummary(); 
+        
     });
 
     
@@ -814,9 +816,9 @@ function buildExplanationBoxHtml(explanationRaw) {
     const { quote, explanationVi } = normalizeExplanation(explanationRaw);
     if (!quote && !explanationVi) return '';
 
-    const quoteHtml = quote ? `<p class="explanation-quote">📖 "${escapeHtml(quote)}"</p>` : '';
-    const textHtml = explanationVi ? `<p class="explanation-text">💡 <strong>Giải thích:</strong> ${escapeHtml(explanationVi)}</p>` : '';
-    const hintText = quote ? '👉🔊 Bấm để xem trong bài đọc & nghe đọc giải thích' : '🔊 Bấm để nghe đọc giải thích';
+    const quoteHtml = quote ? `<p class="explanation-quote"> "${escapeHtml(quote)}"</p>` : '';
+    const textHtml = explanationVi ? `<p class="explanation-text"> <strong>Giải thích:</strong> ${escapeHtml(explanationVi)}</p>` : '';
+    const hintText = quote ? 'Bấm để xem trong bài đọc & nghe đọc giải thích' : 'Bấm để nghe đọc giải thích';
 
     return `
         <div class="explanation-box is-clickable" data-quote="${escapeHtml(quote)}" data-explanation-vi="${escapeHtml(explanationVi)}">
@@ -971,7 +973,7 @@ window.showLearningStats = async function() {
         const dayGroups = groupByDay(resultsRaw, (r) => (r.timestamp?.toDate ? r.timestamp.toDate() : null));
         historyList.innerHTML = dayGroups.map((group) => `
             <div class="day-group">
-                <h4 class="day-group-header">📅 Ngày ${escapeHtml(group.label)}</h4>
+                <h4 class="day-group-header"> Ngày ${escapeHtml(group.label)}</h4>
                 ${group.items.map((r) => renderQuizHistoryItemHtml(r, exerciseMap[r.exerciseId])).join('')}
             </div>
         `).join('');
@@ -1135,7 +1137,7 @@ function renderStatsSessionsList(sessions) {
     const groups = groupByDay(sessions, (s) => (s.date ? new Date(s.date) : null));
     list.innerHTML = groups.map((group) => `
         <div class="day-group">
-            <h4 class="day-group-header">📅 Ngày ${escapeHtml(group.label)}</h4>
+            <h4 class="day-group-header"> Ngày ${escapeHtml(group.label)}</h4>
             ${group.items.map((s) => renderSessionItemHtml(s)).join('')}
         </div>
     `).join('');
