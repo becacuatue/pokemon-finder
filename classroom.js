@@ -836,13 +836,13 @@ function speakExplanation(quote, explanationVi) {
         if (quote && quote.trim()) {
             const uQuote = new SpeechSynthesisUtterance(quote.trim());
             uQuote.lang = 'en-GB';
-            uQuote.rate = 1.1;
+            uQuote.rate = 1.0;
             window.speechSynthesis.speak(uQuote);
         }
         if (explanationVi && explanationVi.trim()) {
             const uExp = new SpeechSynthesisUtterance(explanationVi.trim());
             uExp.lang = 'vi-VN';
-            uExp.rate = 1.5;
+            uExp.rate = 1.1;
             window.speechSynthesis.speak(uExp);
         }
     } catch (e) {
